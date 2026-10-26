@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>B3A · Fu Tai Estate → Shenzhen Bay Port</title>
+  <style>
+    :root {
+      --bg: #0a0f1e;
+      --card: rgba(19, 27, 48, 0.86);
+      --card-strong: rgba(27, 38, 66, 0.9);
+      --line: rgba(255, 255, 255, 0.09);
+      --text: #f5f7ff;
+      --muted: #8e9ab8;
+      --accent: #ffd23f;
+      --accent-ink: #171205;
+      --green: #43e0a0;
+      --red: #ff7b7b;
+      --blue: #6aa8ff;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      background:
+        radial-gradient(900px 550px at 85% -10%, rgba(56, 93, 190, 0.32), transparent 65%),
+        radial-gradient(700px 500px at -10% 105%, rgba(255, 210, 63, 0.10), transparent 60%),
+        linear-gradient(155deg, #080c17 0%, #0b1222 55%, #0a1020 100%);
+      display: grid;
+      place-items: center;
+      padding: 28px 18px;
+    }
+
+    .app {
+      width: min(680px, 100%);
+      animation: rise 0.55s ease both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .route-lockup {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      min-width: 0;
+    }
+
+    .route-badge {
+      flex: none;
+      display: grid;
+      place-items: center;
+      min-width: 66px;
+      height: 46px;
+      padding: 0 11px;
+      border-radius: 11px;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -0.8px;
+      box-shadow: 0 8px 24px rgba(255, 210, 63, 0.14);
+    }
+
+    .route-copy { min-width: 0; }
+
+    .route-copy h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 650;
+      letter-spacing: -0.1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .route-copy p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 12.5px;
+      letter-spacing: 0.02em;
+    }
+
+    .live-pill {
+      flex: none;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.035);
+      color: #c9d4ed;
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 0 rgba(67, 224, 160, 0.5);
+      animation: pulse 2.1s infinite;
+    }
+
+    .live-pill[data-state="error"] .dot {
+      background: var(--red);
+      animation: none;
+    }
+
+    .live-pill[data-state="loading"] .dot {
+      background: var(--blue);
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(67, 224, 160, 0.45); }
+      70% { box-shadow: 0 0 0 6px rgba(67, 224, 160, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(67, 224, 160, 0); }
+    }
+
+    .board {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--card);
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.38);
+      backdrop-filter: blur(18px);
+    }
+
+    .board-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 22px 24px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0 0 7px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .board-head h2 {
+      margin: 0;
+      font-size: 21px;
+      font-weight: 650;
+      letter-spacing: -0.35px;
+    }
+
+    .board-head h2 span {
+      color: var(--muted);
+      font-weight: 450;
+    }
+
+    .hk-time {
+      text-align: right;
+    }
+
+    .hk-time strong {
+      display: block;
+      font-variant-numeric: tabular-nums;
+      font-size: 15px;
+      font-weight: 650;
+    }
+
+    .hk-time small {
+      color: var(--muted);
+      font-size: 10.5px;
+      letter-spacing: 0.04em;
+    }
+
+    .departures {
+      padding: 8px 12px 12px;
+    }
+
+    .departure {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 14px;
+      min-height: 88px;
+      padding: 14px 14px 14px 16px;
+      border-bottom: 1px solid var(--line);
+      border-radius: 12px;
+      transition: background 0.25s ease;
+    }
+
+    .departure:last-child { border-bottom: 0; }
+
+    .departure.next {
+      background: linear-gradient(90deg, rgba(255, 210, 63, 0.075), rgba(255, 210, 63, 0.015));
+    }
+
+    .departure.next::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 18px;
+      bottom: 18px;
+      width: 3px;
+      border-radius: 4px;
+      background: var(--accent);
+    }
+
+    .departure-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #dce3f5;
+    }
+
+    .departure-label small {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 450;
+    }
+
+    .countdown {
+      min-width: 116px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .countdown strong {
+      font-size: 38px;
+      line-height: 0.95;
+      font-weight: 750;
+      letter-spacing: -1.8px;
+    }
+
+    .countdown span {
+      margin-left: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 550;
+      letter-spacing: 0.01em;
+    }
+
+    .departure.next .countdown strong { color: var(--accent); }
+
+    .countdown.due strong,
+    .countdown.gone strong {
+      font-size: 30px;
+      letter-spacing: -0.8px;
+    }
+
+    .countdown.due strong { color: var(--green); }
+    .countdown.gone strong { color: var(--muted); }
+
+    .departure-time {
+      width: 62px;
+      text-align: right;
+      color: var(--muted);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .departure-time b {
+      display: block;
+      margin-bottom: 3px;
+      color: #cad4eb;
+      font-size: 10px;
+      font-weight: 650;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .empty {
+      padding: 38px 22px 42px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 12px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      color: var(--muted);
+      font-size: 19px;
+    }
+
+    .empty h3 {
+      margin: 0 0 5px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .empty p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+
+    .error-bar {
+      display: none;
+      align-items: flex-start;
+      gap: 9px;
+      margin: 0 12px 10px;
+      padding: 11px 13px;
+      border: 1px solid rgba(255, 123, 123, 0.22);
+      border-radius: 10px;
+      background: rgba(255, 123, 123, 0.075);
+      color: #ffc2c2;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .error-bar.show { display: flex; }
+
+    .board-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 20px;
+      border-top: 1px solid var(--line);
+      background: rgba(0, 0, 0, 0.14);
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.55;
+    }
+
+    .meta strong {
+      color: #b9c5df;
+      font-weight: 600;
+    }
+
+    .refresh {
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 34px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.035);
+      color: #dce3f5;
+      font: inherit;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .refresh:hover {
+      background: rgba(255, 255, 255, 0.075);
+      border-color: rgba(255, 255, 255, 0.17);
+    }
+
+    .refresh:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .refresh svg { width: 13px; height: 13px; }
+
+    .refresh.spinning svg { animation: spin 0.8s linear infinite; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .source {
+      margin: 14px 2px 0;
+      color: #65708c;
+      font-size: 10.5px;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .source a {
+      color: #8f9bb6;
+      text-underline-offset: 2px;
+    }
+
+    .skeleton {
+      height: 13px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.11), rgba(255,255,255,0.05));
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+      to { background-position: -200% 0; }
+    }
+
+    @media (max-width: 540px) {
+      body { padding: 18px 13px; }
+      .route-copy h1 { font-size: 14px; }
+      .route-copy p { font-size: 11.5px; }
+      .live-pill { padding: 6px 9px; font-size: 9px; }
+      .board-head { padding: 19px 18px 14px; }
+      .board-head h2 { font-size: 18px; }
+      .hk-time { display: none; }
+      .departures { padding: 6px 8px 8px; }
+      .departure { grid-template-columns: 1fr auto; min-height: 82px; padding: 12px 13px; }
+      .departure-time { display: none; }
+      .countdown { min-width: 96px; }
+      .countdown strong { font-size: 34px; }
+      .board-foot { align-items: flex-start; padding: 13px 15px; }
+      .meta { font-size: 10.5px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="route-lockup">
+        <div class="route-badge" aria-hidden="true">B3A</div>
+        <div class="route-copy">
+          <h1>Fu Tai Estate → Shenzhen Bay Port</h1>
+          <p>Citybus · Castle Peak Road</p>
+        </div>
+      </div>
+      <div class="live-pill" id="livePill" data-state="loading" role="status">
+        <span class="dot"></span>
+        <span id="liveText">Connecting</span>
+      </div>
+    </header>
+
+    <section class="board" aria-labelledby="boardTitle">
+      <div class="board-head">
+        <div>
+          <p class="eyebrow">Live departures</p>
+          <h2 id="boardTitle">Next <span>buses</span></h2>
+        </div>
+        <div class="hk-time">
+          <strong id="hkClock">--:--</strong>
+          <small>Hong Kong time</small>
+        </div>
+      </div>
+
+      <div class="error-bar" id="errorBar" role="alert">
+        <span aria-hidden="true">⚠</span>
+        <span id="errorText">Live data unavailable. Retrying automatically.</span>
+      </div>
+
+      <div class="departures" id="departures" aria-live="polite" aria-atomic="true">
+        <div class="departure next">
+          <div class="departure-label">Loading departures…<small>Fetching live Citybus data</small></div>
+          <div class="countdown"><span class="skeleton" style="display:inline-block;width:76px;height:34px"></span></div>
+        </div>
+      </div>
+
+      <div class="board-foot">
+        <div class="meta">
+          <div><strong id="updatedText">Waiting for data</strong></div>
+          <div id="refreshText">Auto-refresh every 30 seconds</div>
+        </div>
+        <button class="refresh" id="refreshBtn" type="button" aria-label="Refresh departures now">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
+            <path d="M21 3v6h-6"></path>
+          </svg>
+          Refresh
+        </button>
+      </div>
+    </section>
+
+    <p class="source">
+      Live ETA data from <a href="https://data.gov.hk/en-data/dataset/ctb-eta" target="_blank" rel="noopener">DATA.GOV.HK</a> · Citybus open data · Stop 003261
+    </p>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const API_URL = "https://rt.data.gov.hk/v2/transport/citybus/eta/CTB/003261/B3A";
+      const REFRESH_MS = 30_000;
+      const MAX_BUSES = 4;
+
+      const departuresEl = document.getElementById("departures");
+      const updatedTextEl = document.getElementById("updatedText");
+      const refreshTextEl = document.getElementById("refreshText");
+      const hkClockEl = document.getElementById("hkClock");
+      const livePillEl = document.getElementById("livePill");
+      const liveTextEl = document.getElementById("liveText");
+      const errorBarEl = document.getElementById("errorBar");
+      const errorTextEl = document.getElementById("errorText");
+      const refreshBtnEl = document.getElementById("refreshBtn");
+
+      let buses = [];
+      let lastUpdated = null;
+      let nextRefreshAt = null;
+      let refreshTimer = null;
+      let loading = false;
+      let lastError = "";
+
+      const hkTime = (date, seconds = false) => new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Hong_Kong",
+        hour: "2-digit",
+        minute: "2-digit",
+        ...(seconds ? { second: "2-digit" } : {}),
+        hour12: false
+      }).format(date);
+
+      function parseEta(value) {
+        if (!value) return null;
+        const time = new Date(value).getTime();
+        return Number.isFinite(time) ? time : null;
+      }
+
+      function getDisplayBus(bus, now) {
+        const eta = parseEta(bus.eta);
+        if (eta === null) return { ...bus, etaMs: null, diff: Infinity, text: "—", unit: "", state: "unknown" };
+        const diff = eta - now;
+        if (diff <= 30_000 && diff > -90_000) {
+          return { ...bus, etaMs: eta, diff, text: "Due", unit: "", state: "due" };
+        }
+        if (diff <= -90_000) {
+          return { ...bus, etaMs: eta, diff, text: "Departed", unit: "", state: "gone" };
+        }
+        return {
+          ...bus,
+          etaMs: eta,
+          diff,
+          text: String(Math.ceil(diff / 60_000)),
+          unit: "min",
+          state: "upcoming"
+        };
+      }
+
+      function renderClock(now) {
+        hkClockEl.textContent = hkTime(new Date(now), true);
+      }
+
+      function renderDepartures() {
+        const now = Date.now();
+        const live = buses
+          .filter(bus => !bus.dir || bus.dir === "O")
+          .map(bus => getDisplayBus(bus, now))
+          .filter(bus => bus.state !== "gone")
+          .sort((a, b) => (a.etaMs ?? Infinity) - (b.etaMs ?? Infinity))
+          .slice(0, MAX_BUSES);
+
+        if (!live.length) {
+          departuresEl.innerHTML = `
+            <div class="empty">
+              <div class="empty-icon" aria-hidden="true">◷</div>
+              <h3>No upcoming departures</h3>
+              <p>No live B3A buses are currently reported.<br>This board checks again automatically.</p>
+            </div>`;
+          return;
+        }
+
+        departuresEl.innerHTML = live.map((bus, index) => {
+          const isNext = index === 0;
+          const label = isNext ? "Next departure" : `Following bus`;
+          const clock = bus.etaMs ? hkTime(new Date(bus.etaMs)) : "--:--";
+          const subtitle = bus.rmk_en
+            ? bus.rmk_en
+            : (bus.dest_en || "Shenzhen Bay Port");
+          return `
+            <article class="departure${isNext ? " next" : ""}">
+              <div class="departure-label">
+                ${label}
+                <small>${escapeHtml(subtitle)}</small>
+              </div>
+              <div class="countdown ${bus.state}">
+                <strong>${bus.text}</strong>${bus.unit ? `<span>${bus.unit}</span>` : ""}
+              </div>
+              <div class="departure-time"><b>ETA</b>${clock}</div>
+            </article>`;
+        }).join("");
+      }
+
+      function renderMeta() {
+        if (lastUpdated) {
+          const age = Math.max(0, Math.floor((Date.now() - lastUpdated) / 1000));
+          updatedTextEl.textContent = age < 5
+            ? "Updated just now"
+            : `Updated ${age}s ago`;
+        } else {
+          updatedTextEl.textContent = "Waiting for data";
+        }
+
+        if (nextRefreshAt) {
+          const secs = Math.max(0, Math.ceil((nextRefreshAt - Date.now()) / 1000));
+          refreshTextEl.textContent = `Auto-refresh in ${secs}s`;
+        } else {
+          refreshTextEl.textContent = "Auto-refresh every 30 seconds";
+        }
+      }
+
+      function renderStatus() {
+        if (loading) {
+          livePillEl.dataset.state = "loading";
+          liveTextEl.textContent = "Updating";
+        } else if (lastError) {
+          livePillEl.dataset.state = "error";
+          liveTextEl.textContent = "Offline";
+        } else {
+          livePillEl.dataset.state = "live";
+          liveTextEl.textContent = "Live";
+        }
+        errorBarEl.classList.toggle("show", Boolean(lastError));
+        if (lastError) errorTextEl.textContent = lastError;
+      }
+
+      function tick() {
+        const now = Date.now();
+        renderClock(now);
+        renderDepartures();
+        renderMeta();
+      }
+
+      function escapeHtml(str) {
+        return String(str).replace(/[&<>"']/g, c => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        })[c]);
+      }
+
+      async function fetchDepartures() {
+        if (loading) return;
+        loading = true;
+        refreshBtnEl.classList.add("spinning");
+        renderStatus();
+
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 12_000);
+
+        try {
+          const response = await fetch(`${API_URL}?t=${Date.now()}`, {
+            cache: "no-store",
+            signal: controller.signal
+          });
+          if (!response.ok) throw new Error(`Citybus API returned ${response.status}`);
+          const payload = await response.json();
+          if (payload.code) throw new Error(payload.message || "Citybus API error");
+          if (!Array.isArray(payload.data)) throw new Error("Unexpected response from Citybus API");
+
+          buses = payload.data
+            .filter(bus => !bus.dir || bus.dir === "O")
+            .filter(bus => bus.eta)
+            .sort((a, b) => new Date(a.eta) - new Date(b.eta));
+
+          lastUpdated = Date.now();
+          lastError = "";
+        } catch (error) {
+          const aborted = error && error.name === "AbortError";
+          lastError = aborted
+            ? "Connection timed out. Retrying automatically."
+            : `Live data unavailable (${error.message || "network error"}). Retrying automatically.`;
+        } finally {
+          clearTimeout(timeout);
+          loading = false;
+          nextRefreshAt = Date.now() + REFRESH_MS;
+          refreshBtnEl.classList.remove("spinning");
+          renderStatus();
+          tick();
+          clearTimeout(refreshTimer);
+          refreshTimer = setTimeout(fetchDepartures, REFRESH_MS);
+        }
+      }
+
+      refreshBtnEl.addEventListener("click", () => {
+        if (!loading) fetchDepartures();
+      });
+
+      tick();
+      fetchDepartures();
+      setInterval(tick, 1_000);
+    })();
+  </script>
+</body>
+</html>
