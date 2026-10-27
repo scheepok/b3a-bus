@@ -3,707 +3,1704 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fbf3e5">
+  <meta name="description" content="B3A live bus board with weather, exchange rates and traffic snapshots.">
   <title>B3A · Fu Tai Estate → Shenzhen Bay Port</title>
   <style>
     :root {
       --bg: #fbf3e5;
       --card: rgba(255, 252, 244, 0.9);
-      --card-strong: rgba(255, 248, 236, 0.95);
+      --card-strong: rgba(255, 248, 236, 0.96);
       --line: rgba(185, 95, 33, 0.18);
+      --line-strong: rgba(185, 95, 33, 0.28);
       --text: #b8450a;
       --muted: #a4663e;
       --accent: #e2620f;
       --accent-ink: #fffaf1;
       --green: #2e8b63;
       --red: #b33a2f;
-      --blue: #b45309;
+      --shadow: 0 24px 64px rgba(122, 66, 20, 0.13);
     }
 
     * { box-sizing: border-box; }
-
+    [hidden] { display: none !important; }
     html, body { min-height: 100%; }
 
     body {
       margin: 0;
       min-height: 100vh;
+      overflow-x: hidden;
       color: var(--text);
-      font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
       background:
         radial-gradient(900px 550px at 85% -10%, rgba(255, 173, 102, 0.26), transparent 65%),
         radial-gradient(700px 500px at -10% 105%, rgba(214, 122, 48, 0.12), transparent 60%),
         linear-gradient(155deg, #fffaf0 0%, #fbf3e5 55%, #f5ead8 100%);
+    }
+
+    a { color: inherit; }
+
+    /* ---------- top marquees ---------- */
+    .ticker-stack {
+      width: 100%;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 250, 240, 0.55);
+      backdrop-filter: blur(14px);
+    }
+
+    .info-ticker {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 250, 240, 0.48);
+    }
+
+    .info-ticker:last-child { border-bottom: 0; }
+    .weather-ticker { height: 70px; }
+    .fx-ticker { height: 58px; }
+
+    .info-ticker::before,
+    .info-ticker::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 54px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .info-ticker::before { left: 0; background: linear-gradient(90deg, #fff8ec, transparent); }
+    .info-ticker::after { right: 0; background: linear-gradient(270deg, #fff8ec, transparent); }
+
+    .ticker-track {
+      display: flex;
+      width: max-content;
+      height: 100%;
+      will-change: transform;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+
+    .ticker-track.left {
+      animation-name: ticker-left;
+      animation-duration: var(--ticker-duration, 48s);
+    }
+
+    .ticker-track.right {
+      animation-name: ticker-right;
+      animation-duration: var(--ticker-duration, 90s);
+    }
+
+    @keyframes ticker-left {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    @keyframes ticker-right {
+      from { transform: translateX(-50%); }
+      to { transform: translateX(0); }
+    }
+
+    .ticker-track:hover { animation-play-state: paused; }
+
+    .ticker-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 100vw;
+      height: 100%;
+      padding: 0 12px;
+      flex: none;
+      justify-content: space-around;
+    }
+
+    .ticker-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 42px;
+      padding: 6px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 252, 244, 0.76);
+      white-space: nowrap;
+      box-shadow: 0 6px 18px rgba(122, 66, 20, 0.05);
+      text-decoration: none;
+    }
+
+    .weather-ticker .ticker-card { min-width: 240px; }
+    .fx-ticker .ticker-card { min-width: 210px; }
+
+    .ticker-card strong { display: block; font-size: 14px; letter-spacing: 0.01em; }
+    .ticker-card small { display: block; margin-top: 2px; font-size: 10.5px; color: var(--muted); }
+
+    .ticker-copy { display: block; min-width: 0; }
+    .ticker-copy small { overflow: hidden; text-overflow: ellipsis; max-width: 320px; }
+
+    .weather-emoji {
       display: grid;
       place-items: center;
-      padding: 28px 18px;
+      width: 30px;
+      height: 30px;
+      border-radius: 11px;
+      background: rgba(226, 98, 15, 0.08);
+      font-size: 18px;
+      flex: none;
     }
 
+    .weather-map { border-style: dashed; background: rgba(226, 98, 15, 0.045); }
+    .weather-map:hover { border-color: var(--line-strong); background: rgba(226, 98, 15, 0.08); }
+
+    .fx-card { justify-content: flex-start; }
+    .fx-pair { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; }
+    .fx-rate { font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .fx-card .ticker-copy small { max-width: 230px; }
+    .fx-meta { border-style: dashed; background: rgba(226, 98, 15, 0.04); }
+
+    .ticker-loading { color: var(--muted); font-size: 12px; }
+
+    /* ---------- page ---------- */
     .app {
-      width: min(680px, 100%);
-      animation: rise 0.55s ease both;
-    }
-
-    @keyframes rise {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
+      width: min(800px, 100%);
+      margin: 0 auto;
+      padding: 18px 16px 36px;
     }
 
     .topbar {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 16px;
-      margin-bottom: 18px;
-    }
-
-    .route-lockup {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      min-width: 0;
-    }
-
-    .route-badge {
-      flex: none;
-      display: grid;
-      place-items: center;
-      min-width: 66px;
-      height: 46px;
-      padding: 0 11px;
-      border-radius: 11px;
-      background: var(--accent);
-      color: var(--accent-ink);
-      font-size: 24px;
-      font-weight: 900;
-      letter-spacing: -0.8px;
-      box-shadow: 0 8px 24px rgba(226, 98, 15, 0.22);
-    }
-
-    .route-copy { min-width: 0; }
-
-    .route-copy h1 {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 650;
-      letter-spacing: -0.1px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .route-copy p {
-      margin: 3px 0 0;
-      color: var(--muted);
-      font-size: 12.5px;
-      letter-spacing: 0.02em;
-    }
-
-    .live-pill {
-      flex: none;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 7px 11px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.62);
-      color: #915531;
-      font-size: 10px;
-      font-weight: 750;
-      letter-spacing: 0.13em;
-      text-transform: uppercase;
-    }
-
-    .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 0 0 rgba(46, 139, 99, 0.5);
-      animation: pulse 2.1s infinite;
-    }
-
-    .live-pill[data-state="error"] .dot {
-      background: var(--red);
-      animation: none;
-    }
-
-    .live-pill[data-state="loading"] .dot {
-      background: var(--blue);
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(46, 139, 99, 0.45); }
-      70% { box-shadow: 0 0 0 6px rgba(46, 139, 99, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(46, 139, 99, 0); }
-    }
-
-    .board {
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      background: var(--card);
-      box-shadow: 0 28px 70px rgba(122, 66, 20, 0.14);
-      backdrop-filter: blur(18px);
-    }
-
-    .board-head {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 22px 24px 16px;
-      border-bottom: 1px solid var(--line);
+      margin-bottom: 12px;
     }
 
     .eyebrow {
-      margin: 0 0 7px;
-      color: var(--muted);
+      margin: 0 0 5px;
       font-size: 10px;
-      font-weight: 750;
-      letter-spacing: 0.16em;
+      font-weight: 800;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
+      color: var(--muted);
     }
 
-    .board-head h2 {
+    h1 {
       margin: 0;
-      font-size: 21px;
-      font-weight: 650;
-      letter-spacing: -0.35px;
+      font-size: clamp(23px, 5.2vw, 34px);
+      line-height: 1.02;
+      letter-spacing: -0.045em;
     }
 
-    .board-head h2 span {
-      color: var(--muted);
-      font-weight: 450;
-    }
+    .meta { margin-top: 7px; font-size: 11.5px; color: var(--muted); letter-spacing: 0.02em; }
 
-    .hk-time {
-      text-align: right;
-    }
+    .lang-switch { display: flex; gap: 5px; flex-wrap: wrap; flex: none; }
 
-    .hk-time strong {
-      display: block;
-      font-variant-numeric: tabular-nums;
-      font-size: 15px;
-      font-weight: 650;
-    }
-
-    .hk-time small {
-      color: var(--muted);
+    .lang-btn {
+      border: 1px solid var(--line-strong);
+      background: rgba(255, 251, 244, 0.74);
+      color: var(--text);
+      padding: 6px 9px;
+      border-radius: 999px;
+      font: inherit;
       font-size: 10.5px;
-      letter-spacing: 0.04em;
+      font-weight: 800;
+      cursor: pointer;
     }
 
-    .departures {
-      padding: 8px 12px 12px;
-    }
+    .lang-btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
-    .departure {
+    .board {
       position: relative;
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      align-items: center;
-      gap: 14px;
-      min-height: 88px;
-      padding: 14px 14px 14px 16px;
-      border-bottom: 1px solid var(--line);
-      border-radius: 12px;
-      transition: background 0.25s ease;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 18px 18px 16px;
+      background: linear-gradient(180deg, rgba(255, 252, 244, 0.96), rgba(255, 246, 231, 0.84));
+      box-shadow: var(--shadow);
     }
 
-    .departure:last-child { border-bottom: 0; }
-
-    .departure.next {
-      background: linear-gradient(90deg, rgba(226, 98, 15, 0.09), rgba(226, 98, 15, 0.02));
-    }
-
-    .departure.next::before {
+    .board::after {
       content: "";
       position: absolute;
-      left: 0;
-      top: 18px;
-      bottom: 18px;
-      width: 3px;
-      border-radius: 4px;
-      background: var(--accent);
+      width: 230px;
+      height: 230px;
+      right: -120px;
+      top: -120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 159, 77, 0.22), transparent 68%);
+      pointer-events: none;
     }
 
-    .departure-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-    }
+    .board-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
 
-    .departure-label small {
-      display: block;
-      margin-top: 5px;
+    .clock {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 7px 10px;
+      background: rgba(255, 250, 240, 0.78);
+      font-size: 10.5px;
+      font-weight: 800;
       color: var(--muted);
-      font-size: 11px;
-      font-weight: 450;
-    }
-
-    .countdown {
-      min-width: 116px;
-      text-align: right;
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
 
-    .countdown strong {
-      font-size: 38px;
-      line-height: 0.95;
-      font-weight: 750;
-      letter-spacing: -1.8px;
-    }
-
-    .countdown span {
-      margin-left: 5px;
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 14px 0 10px;
       color: var(--muted);
-      font-size: 12px;
-      font-weight: 550;
-      letter-spacing: 0.01em;
+      font-size: 11px;
+      font-weight: 700;
     }
 
-    .departure.next .countdown strong { color: var(--accent); }
-
-    .countdown.due strong,
-    .countdown.gone strong {
-      font-size: 30px;
-      letter-spacing: -0.8px;
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 4px rgba(46, 139, 99, 0.12);
     }
 
-    .countdown.due strong { color: var(--green); }
-    .countdown.gone strong { color: var(--muted); }
+    .dot.bad { background: var(--red); box-shadow: 0 0 0 4px rgba(179, 58, 47, 0.12); }
 
-    .departure-time {
-      width: 62px;
-      text-align: right;
-      color: var(--muted);
-      font-size: 12px;
+    .list { display: grid; gap: 8px; }
+
+    .departure {
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 11px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 252, 245, 0.7);
+    }
+
+    .eta {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: rgba(226, 98, 15, 0.08);
+      color: var(--accent);
+      font-size: 18px;
+      font-weight: 900;
       font-variant-numeric: tabular-nums;
     }
 
-    .departure-time b {
-      display: block;
-      margin-bottom: 3px;
-      color: var(--text);
-      font-size: 10px;
-      font-weight: 650;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
+    .departure-main strong { display: block; font-size: 13.5px; }
+    .departure-main small { display: block; margin-top: 3px; color: var(--muted); font-size: 10.5px; }
+    .departure-side { text-align: right; color: var(--muted); font-size: 10.5px; line-height: 1.45; }
+    .departure-side strong { display: block; color: var(--text); font-size: 12px; }
+    .empty { padding: 20px 14px; border: 1px dashed var(--line-strong); border-radius: 16px; text-align: center; color: var(--muted); font-size: 12px; }
 
-    .empty {
-      padding: 38px 22px 42px;
-      text-align: center;
-    }
+    .board-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; color: var(--muted); font-size: 10.5px; }
+    .refresh { border: 1px solid var(--line); border-radius: 999px; background: rgba(255, 252, 244, 0.72); color: var(--text); padding: 5px 9px; font: inherit; font-size: 10px; font-weight: 800; cursor: pointer; }
+    .refresh:disabled { opacity: 0.55; cursor: default; }
 
-    .empty-icon {
-      width: 44px;
-      height: 44px;
-      margin: 0 auto 12px;
-      display: grid;
-      place-items: center;
+    /* ---------- lower information panels ---------- */
+    .info-panel {
+      margin-top: 16px;
       border: 1px solid var(--line);
-      border-radius: 13px;
-      color: var(--muted);
-      font-size: 19px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255, 252, 244, 0.92), rgba(255, 247, 233, 0.82));
+      box-shadow: 0 16px 42px rgba(122, 66, 20, 0.09);
+      overflow: hidden;
     }
 
-    .empty h3 {
-      margin: 0 0 5px;
-      font-size: 15px;
-      font-weight: 600;
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 15px 16px 11px;
     }
 
-    .empty p {
+    .section-head h2 {
       margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+    }
+
+    .section-head h2 span {
+      display: inline-block;
+      margin-left: 7px;
+      padding: 3px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(226, 98, 15, 0.06);
       color: var(--muted);
-      font-size: 12.5px;
-      line-height: 1.5;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      vertical-align: 2px;
     }
 
-    .error-bar {
-      display: none;
-      align-items: flex-start;
+    .section-tools { display: flex; align-items: center; gap: 7px; flex: none; }
+
+    .section-action,
+    .official-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      background: rgba(255, 252, 244, 0.75);
+      color: var(--muted);
+      padding: 5px 9px;
+      font: inherit;
+      font-size: 9.5px;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .section-action:hover,
+    .official-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    .section-note { margin: 0; padding: 9px 16px 13px; color: var(--muted); font-size: 9.5px; line-height: 1.45; }
+    .section-note a { text-decoration: none; border-bottom: 1px dashed currentColor; }
+
+    .restore-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      width: 100%;
+      margin-top: 12px;
+      padding: 11px 14px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 16px;
+      background: rgba(255, 250, 240, 0.6);
+      color: var(--muted);
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .restore-bar:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ---------- traffic snapshot marquee ---------- */
+    .traffic-panel { padding-bottom: 2px; }
+
+    .traffic-viewport {
+      position: relative;
+      overflow: hidden;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 250, 240, 0.32);
+    }
+
+    .traffic-viewport::before,
+    .traffic-viewport::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 42px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .traffic-viewport::before { left: 0; background: linear-gradient(90deg, #fff8ec, transparent); }
+    .traffic-viewport::after { right: 0; background: linear-gradient(270deg, #fff8ec, transparent); }
+
+    .traffic-track { height: auto; }
+
+    .traffic-group {
       gap: 9px;
-      margin: 0 12px 10px;
-      padding: 11px 13px;
-      border: 1px solid rgba(179, 58, 47, 0.24);
-      border-radius: 10px;
-      background: rgba(179, 58, 47, 0.07);
-      color: #a33228;
-      font-size: 12px;
-      line-height: 1.45;
+      padding: 10px 12px;
+      align-items: stretch;
     }
 
-    .error-bar.show { display: flex; }
+    .snapshot-card {
+      position: relative;
+      display: block;
+      flex: none;
+      width: 205px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 252, 244, 0.85);
+      color: var(--text);
+      text-decoration: none;
+      box-shadow: 0 6px 18px rgba(122, 66, 20, 0.06);
+    }
 
-    .board-foot {
+    .snapshot-card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: linear-gradient(135deg, #e8d6bd, #f8ead5);
+    }
+
+    .snapshot-card .snap-text {
+      display: block;
+      padding: 6px 8px 7px;
+      line-height: 1.25;
+    }
+
+    .snapshot-card .snap-text strong {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 9.5px;
+    }
+
+    .snapshot-card .snap-text small {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    .snapshot-toggle {
+      display: flex;
+      flex: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      width: 98px;
+      min-height: 100%;
+      border: 1px dashed var(--line-strong);
+      border-radius: 14px;
+      background: rgba(226, 98, 15, 0.07);
+      color: var(--accent);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .snapshot-toggle span { font-size: 18px; line-height: 0.9; }
+    .snapshot-toggle small { color: var(--muted); font-size: 8px; font-weight: 700; }
+    .snapshot-toggle:hover { border-color: var(--accent); background: rgba(226, 98, 15, 0.12); }
+
+    /* ---------- live traffic ---------- */
+    .live-panel { overflow: visible; }
+
+    .webcast-grid {
+      display: grid;
+      gap: 7px;
+      padding: 0 12px;
+    }
+
+    .webcast-grid.single { grid-template-columns: 1fr; }
+    .webcast-grid.six { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .webcast-tile {
+      position: relative;
+      margin: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #eadbc4;
+      box-shadow: 0 6px 18px rgba(122, 66, 20, 0.06);
+    }
+
+    .webcast-tile img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: linear-gradient(135deg, #e8d6bd, #f8ead5);
+    }
+
+    .webcast-tile figcaption {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      padding: 14px 20px;
-      border-top: 1px solid var(--line);
-      background: rgba(177, 95, 25, 0.05);
+      gap: 8px;
+      padding: 6px 8px;
+      background: rgba(255, 250, 240, 0.94);
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 1.2;
     }
 
-    .meta {
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.55;
+    .webcast-tile figcaption span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .meta strong {
-      color: var(--text);
-      font-weight: 600;
-    }
+    .webcast-tile figcaption small { flex: none; color: var(--muted); font-size: 8px; letter-spacing: 0.04em; }
 
-    .refresh {
-      flex: none;
-      display: inline-flex;
+    .webcast-grid.single .webcast-tile figcaption { padding: 8px 10px; font-size: 11px; }
+    .webcast-grid.single .webcast-tile figcaption small { font-size: 9px; }
+
+    .live-controls {
+      display: flex;
       align-items: center;
-      gap: 7px;
-      height: 34px;
-      padding: 0 13px;
-      border: 1px solid var(--line);
-      border-radius: 9px;
-      background: rgba(255, 255, 255, 0.62);
-      color: var(--text);
+      gap: 9px;
+      flex-wrap: wrap;
+      padding: 10px 12px 0;
+    }
+
+    .view-toggle {
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--accent-ink);
+      padding: 7px 12px;
       font: inherit;
-      font-size: 11.5px;
-      font-weight: 600;
+      font-size: 10.5px;
+      font-weight: 900;
       cursor: pointer;
-      transition: background 0.2s ease, border-color 0.2s ease;
     }
 
-    .refresh:hover {
-      background: rgba(226, 98, 15, 0.08);
-      border-color: rgba(226, 98, 15, 0.28);
+    .view-toggle:hover { filter: brightness(1.04); }
+
+    .region-switch { display: flex; gap: 5px; flex-wrap: wrap; }
+
+    .region-btn {
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      background: rgba(255, 252, 244, 0.72);
+      color: var(--muted);
+      padding: 6px 9px;
+      font: inherit;
+      font-size: 9.5px;
+      font-weight: 800;
+      cursor: pointer;
     }
 
-    .refresh:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-    }
-
-    .refresh svg { width: 13px; height: 13px; }
-
-    .refresh.spinning svg { animation: spin 0.8s linear infinite; }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .region-btn[aria-pressed="true"] { border-color: var(--accent); background: rgba(226, 98, 15, 0.11); color: var(--accent); }
 
     .source {
-      margin: 14px 2px 0;
-      color: #a87a5b;
-      font-size: 10.5px;
-      line-height: 1.55;
-      text-align: center;
+      margin: 18px 2px 0;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.6;
     }
 
-    .source a {
-      color: var(--text);
-      text-underline-offset: 2px;
-    }
+    .source a { text-decoration: none; border-bottom: 1px dashed currentColor; }
+    .distance-note { color: var(--muted); }
 
-    .skeleton {
-      height: 13px;
-      border-radius: 4px;
-      background: linear-gradient(90deg, rgba(184,69,10,0.05), rgba(184,69,10,0.12), rgba(184,69,10,0.05));
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-    }
-
-    @keyframes shimmer {
-      to { background-position: -200% 0; }
-    }
-
-    @media (max-width: 540px) {
-      body { padding: 18px 13px; }
-      .route-copy h1 { font-size: 14px; }
-      .route-copy p { font-size: 11.5px; }
-      .live-pill { padding: 6px 9px; font-size: 9px; }
-      .board-head { padding: 19px 18px 14px; }
-      .board-head h2 { font-size: 18px; }
-      .hk-time { display: none; }
-      .departures { padding: 6px 8px 8px; }
-      .departure { grid-template-columns: 1fr auto; min-height: 82px; padding: 12px 13px; }
-      .departure-time { display: none; }
-      .countdown { min-width: 96px; }
-      .countdown strong { font-size: 34px; }
-      .board-foot { align-items: flex-start; padding: 13px 15px; }
-      .meta { font-size: 10.5px; }
+    @media (max-width: 620px) {
+      .app { padding: 14px 10px 28px; }
+      .topbar { flex-direction: column; gap: 9px; }
+      .lang-switch { align-self: flex-start; }
+      .board { border-radius: 20px; padding: 15px 13px 13px; }
+      .departure { grid-template-columns: 44px minmax(0, 1fr) auto; gap: 9px; padding: 10px; }
+      .eta { width: 42px; height: 42px; border-radius: 12px; font-size: 16px; }
+      .section-head { padding: 13px 12px 10px; }
+      .section-head h2 { font-size: 16px; }
+      .webcast-grid.six { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .webcast-grid { padding: 0 9px; }
+      .live-controls { padding-left: 9px; padding-right: 9px; }
+      .section-note { padding-left: 12px; padding-right: 12px; }
+      .snapshot-card { width: 180px; }
+      .snapshot-toggle { width: 84px; }
+      .weather-ticker { height: 66px; }
+      .fx-ticker { height: 56px; }
+      .ticker-card { padding: 5px 10px; }
+      .weather-ticker .ticker-card { min-width: 215px; }
+      .fx-ticker .ticker-card { min-width: 185px; }
+      .ticker-copy small { max-width: 245px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
+      .ticker-track { animation: none !important; transform: none !important; }
+      .ticker-group.clone { display: none; }
+      .info-ticker, .traffic-viewport { overflow-x: auto; }
+      .ticker-track, .ticker-group { min-width: max-content; }
     }
   </style>
 </head>
+
 <body>
-  <main class="app">
-    <header class="topbar">
-      <div class="route-lockup">
-        <div class="route-badge" aria-hidden="true">B3A</div>
-        <div class="route-copy">
-          <h1>Fu Tai Estate → Shenzhen Bay Port</h1>
-          <p>Citybus · Castle Peak Road</p>
+  <div class="ticker-stack" id="tickerStack">
+    <section class="info-ticker weather-ticker" id="weatherTicker" aria-label="Weather">
+      <div class="ticker-track left" id="weatherTrack">
+        <div class="ticker-group" id="weatherGroup">
+          <span class="ticker-card ticker-loading">Loading weather…</span>
         </div>
       </div>
-      <div class="live-pill" id="livePill" data-state="loading" role="status">
-        <span class="dot"></span>
-        <span id="liveText">Connecting</span>
+    </section>
+    <section class="info-ticker fx-ticker" id="fxTicker" aria-label="Exchange rates">
+      <div class="ticker-track left" id="fxTrack">
+        <div class="ticker-group" id="fxGroup">
+          <span class="ticker-card ticker-loading">Loading rates…</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow" id="routeEyebrow">Citybus · Live board</p>
+        <h1 id="routeTitle">Fu Tai Estate → Shenzhen Bay Port</h1>
+        <p class="meta" id="routeMeta">Route B3A · Stop 003261 · Fu Tai Estate, Castle Peak Road</p>
+      </div>
+      <div class="lang-switch" role="group" aria-label="Language">
+        <button class="lang-btn" type="button" data-lang="en" aria-pressed="true">EN</button>
+        <button class="lang-btn" type="button" data-lang="zh-Hans" aria-pressed="false">简</button>
+        <button class="lang-btn" type="button" data-lang="zh-Hant" aria-pressed="false">繁</button>
       </div>
     </header>
 
     <section class="board" aria-labelledby="boardTitle">
       <div class="board-head">
         <div>
-          <p class="eyebrow">Live departures</p>
-          <h2 id="boardTitle">Next <span>buses</span></h2>
+          <p class="eyebrow" id="boardEyebrow">Next departures</p>
+          <h2 id="boardTitle" style="margin:0;font-size:21px;letter-spacing:-0.035em;">B3A · Fu Tai Estate</h2>
         </div>
-        <div class="hk-time">
-          <strong id="hkClock">--:--</strong>
-          <small>Hong Kong time</small>
-        </div>
+        <div class="clock" id="clock">--:--:-- HKT</div>
       </div>
 
-      <div class="error-bar" id="errorBar" role="alert">
-        <span aria-hidden="true">⚠</span>
-        <span id="errorText">Live data unavailable. Retrying automatically.</span>
+      <div class="status">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">Connecting to Citybus open data…</span>
       </div>
 
-      <div class="departures" id="departures" aria-live="polite" aria-atomic="true">
-        <div class="departure next">
-          <div class="departure-label">Loading departures…<small>Fetching live Citybus data</small></div>
-          <div class="countdown"><span class="skeleton" style="display:inline-block;width:76px;height:34px"></span></div>
-        </div>
+      <div class="list" id="departureList" aria-live="polite">
+        <div class="empty" id="emptyState">Loading departures…</div>
       </div>
 
       <div class="board-foot">
-        <div class="meta">
-          <div><strong id="updatedText">Waiting for data</strong></div>
-          <div id="refreshText">Auto-refresh every 30 seconds</div>
-        </div>
-        <button class="refresh" id="refreshBtn" type="button" aria-label="Refresh departures now">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
-            <path d="M21 3v6h-6"></path>
-          </svg>
-          Refresh
-        </button>
+        <span id="updatedText">Not updated yet</span>
+        <button class="refresh" id="refreshButton" type="button">Refresh now</button>
       </div>
     </section>
 
+    <section class="info-panel traffic-panel" id="trafficSection" aria-labelledby="trafficHeading">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow" id="trafficEyebrow">Traffic information</p>
+          <h2 id="trafficHeading">Traffic snapshots <span id="trafficCount">18 cameras</span></h2>
+        </div>
+        <button class="section-action" id="trafficHideBtn" type="button">Hide</button>
+      </div>
+      <div class="traffic-viewport">
+        <div class="ticker-track right traffic-track" id="trafficTrack">
+          <div class="ticker-group traffic-group" id="trafficGroup"></div>
+        </div>
+      </div>
+      <p class="section-note" id="trafficNote">Official TD traffic snapshots · refresh every 30 seconds</p>
+    </section>
+    <button class="restore-bar" id="trafficRestore" type="button" hidden>Show traffic snapshots</button>
+
+    <section class="info-panel live-panel" id="liveSection" aria-labelledby="liveHeading">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow" id="liveEyebrow">Live traffic</p>
+          <h2 id="liveHeading">Live traffic</h2>
+        </div>
+        <div class="section-tools">
+          <a class="official-link" id="officialLink" href="https://www.hkemobility.gov.hk/tc/traffic-information/live/webcast" target="_blank" rel="noopener">Official webcast ↗</a>
+          <button class="section-action" id="liveHideBtn" type="button">Hide</button>
+        </div>
+      </div>
+
+      <div class="webcast-grid single" id="webcastGrid"></div>
+
+      <div class="live-controls">
+        <button class="view-toggle" id="viewToggle" type="button" aria-pressed="false">Six views</button>
+        <div class="region-switch" id="regionSwitch" hidden>
+          <button class="region-btn" type="button" data-region="hk" aria-pressed="false">Hong Kong</button>
+          <button class="region-btn" type="button" data-region="kl" aria-pressed="false">Kowloon</button>
+          <button class="region-btn" type="button" data-region="tw" aria-pressed="false">Tsuen Wan</button>
+          <button class="region-btn" type="button" data-region="tm" aria-pressed="false">Tuen Mun</button>
+          <button class="region-btn" type="button" data-region="tmk" aria-pressed="true">Tuen Mun (Ting Kau–Tai Lam Kok)</button>
+        </div>
+      </div>
+      <p class="section-note" id="liveNote">Images refresh every 15 seconds. Six-view uses TD snapshots; the stream link opens HKeMobility.</p>
+    </section>
+    <button class="restore-bar" id="liveRestore" type="button" hidden>Show live traffic</button>
+
     <p class="source">
-      Live ETA data from <a href="https://data.gov.hk/en-data/dataset/ctb-eta" target="_blank" rel="noopener">DATA.GOV.HK</a> · Citybus open data · Stop 003261
+      <span id="sourceLine">Bus ETA: Citybus open data via DATA.GOV.HK · Stop 003261.</span><br>
+      <span id="sourceLine2">Weather: CMA · FX: open.er-api.com · Traffic: TD / HKeMobility.</span><br>
+      <span class="distance-note" id="distanceNote">Distance to stop is approximated from the ETA at 25 km/h.</span>
     </p>
   </main>
 
   <script>
-    (() => {
-      "use strict";
 
-      const API_URL = "https://rt.data.gov.hk/v2/transport/citybus/eta/CTB/003261/B3A";
-      const REFRESH_MS = 30_000;
-      const MAX_BUSES = 4;
+    "use strict";
 
-      const departuresEl = document.getElementById("departures");
-      const updatedTextEl = document.getElementById("updatedText");
-      const refreshTextEl = document.getElementById("refreshText");
-      const hkClockEl = document.getElementById("hkClock");
-      const livePillEl = document.getElementById("livePill");
-      const liveTextEl = document.getElementById("liveText");
-      const errorBarEl = document.getElementById("errorBar");
-      const errorTextEl = document.getElementById("errorText");
-      const refreshBtnEl = document.getElementById("refreshBtn");
+    const I18N = {
+      en: {
+        title: "B3A · Fu Tai Estate → Shenzhen Bay Port",
+        routeEyebrow: "Citybus · Live board",
+        routeTitle: "Fu Tai Estate → Shenzhen Bay Port",
+        routeMeta: "Route B3A · Stop 003261 · Fu Tai Estate, Castle Peak Road",
+        boardEyebrow: "Next departures",
+        boardTitle: "B3A · Fu Tai Estate",
+        statusConnecting: "Connecting to Citybus open data…",
+        statusLive: "Live · Citybus open data",
+        statusError: "Connection problem · retrying",
+        statusUpdated: "Updated",
+        updatedNever: "Not updated yet",
+        refreshNow: "Refresh now",
+        refreshing: "Refreshing…",
+        emptyLoading: "Loading departures…",
+        emptyNone: "No upcoming departures found.",
+        emptyError: "Live data is temporarily unavailable.",
+        toDestination: "Shenzhen Bay Port",
+        stopLabel: "Fu Tai Estate, Castle Peak Road",
+        due: "Due",
+        minuteShort: "min",
+        etaUnknown: "—",
+        approxDistance: "approx. {km} km to stop",
+        weatherTitle: "Weather",
+        weatherNow: "Now",
+        weatherToday: "Today",
+        weatherTomorrow: "Tomorrow",
+        weatherDay: "Day",
+        weatherNight: "Night",
+        weatherMap: "CMA weather map",
+        weatherMapSub: "Radar · satellite · temperature",
+        weatherCityHK: "Hong Kong",
+        weatherCitySZ: "Shenzhen · near Shenzhen Bay",
+        weatherHumidity: "Humidity",
+        weatherFeels: "Feels like",
+        weatherUpdated: "Updated",
+        weatherUnavailable: "Weather data unavailable",
+        weatherLoading: "Loading weather…",
+        fxTitle: "Exchange rates",
+        fxUnavailable: "Exchange rates unavailable",
+        fxLoading: "Loading rates…",
+        fxSource: "open.er-api.com · indicative",
+        fxUpdated: "Updated",
+        trafficEyebrow: "Traffic information",
+        trafficTitle: "Traffic snapshots",
+        trafficCount: "18 cameras",
+        trafficNote: "Official TD traffic snapshots · refresh every 30 seconds",
+        trafficHide: "Hide",
+        trafficShow: "Show traffic snapshots",
+        trafficExpand: "Expand",
+        trafficCollapse: "Hide",
+        trafficToggleHint: "snapshots",
+        liveEyebrow: "Live traffic",
+        liveTitle: "Live traffic",
+        liveNote: "Images refresh every 15 seconds. Six-view uses TD snapshots; the stream link opens HKeMobility.",
+        liveHide: "Hide",
+        liveShow: "Show live traffic",
+        viewSix: "Six views",
+        viewSingle: "Single view",
+        officialWebcast: "Official webcast ↗",
+        regionHK: "Hong Kong",
+        regionKL: "Kowloon",
+        regionTW: "Tsuen Wan",
+        regionTM: "Tuen Mun",
+        regionTMK: "Tuen Mun (Ting Kau–Tai Lam Kok)",
+        liveDefault: "Tuen Mun Road – Tai Lam Kok [TR114F]",
+        sourceBus: "Bus ETA: Citybus open data via DATA.GOV.HK · Stop 003261.",
+        sourceOther: "Weather: CMA · FX: open.er-api.com · Traffic: TD / HKeMobility.",
+        distanceNote: "Distance to stop is approximated from the ETA at 25 km/h."
+      },
+      "zh-Hans": {
+        title: "B3A · 富泰邨 → 深圳湾口岸",
+        routeEyebrow: "城巴 · 实时看板",
+        routeTitle: "富泰邨 → 深圳湾口岸",
+        routeMeta: "B3A 线 · 站点 003261 · 富泰邨，青山公路",
+        boardEyebrow: "下一班",
+        boardTitle: "B3A · 富泰邨",
+        statusConnecting: "正在连接城巴开放数据…",
+        statusLive: "实时 · 城巴开放数据",
+        statusError: "连接异常 · 正在重试",
+        statusUpdated: "更新于",
+        updatedNever: "尚未更新",
+        refreshNow: "立即刷新",
+        refreshing: "刷新中…",
+        emptyLoading: "正在读取班次…",
+        emptyNone: "暂时没有即将到站的班次。",
+        emptyError: "实时数据暂时不可用。",
+        toDestination: "深圳湾口岸",
+        stopLabel: "富泰邨，青山公路",
+        due: "即将到站",
+        minuteShort: "分钟",
+        etaUnknown: "—",
+        approxDistance: "距站约 {km} 公里",
+        weatherTitle: "天气",
+        weatherNow: "现在",
+        weatherToday: "今天",
+        weatherTomorrow: "明天",
+        weatherDay: "日间",
+        weatherNight: "晚间",
+        weatherMap: "CMA 天气图",
+        weatherMapSub: "雷达 · 卫星 · 气温",
+        weatherCityHK: "香港",
+        weatherCitySZ: "深圳 · 深圳湾附近",
+        weatherHumidity: "湿度",
+        weatherFeels: "体感",
+        weatherUpdated: "更新",
+        weatherUnavailable: "天气资料暂时不可用",
+        weatherLoading: "正在读取天气…",
+        fxTitle: "汇率",
+        fxUnavailable: "汇率资料暂时不可用",
+        fxLoading: "正在读取汇率…",
+        fxSource: "open.er-api.com · 仅供参考",
+        fxUpdated: "更新于",
+        trafficEyebrow: "交通资讯",
+        trafficTitle: "交通快拍",
+        trafficCount: "18 个镜头",
+        trafficNote: "运输署官方交通快拍 · 每 30 秒更新",
+        trafficHide: "隐藏",
+        trafficShow: "显示交通快拍",
+        trafficExpand: "展开",
+        trafficCollapse: "隐藏",
+        trafficToggleHint: "快拍",
+        liveEyebrow: "交通直播",
+        liveTitle: "交通直播",
+        liveNote: "画面每 15 秒更新。六画面使用运输署快拍；官方直播链接会打开「香港出行易」。",
+        liveHide: "隐藏",
+        liveShow: "显示交通直播",
+        viewSix: "六画面",
+        viewSingle: "单画面",
+        officialWebcast: "官方直播 ↗",
+        regionHK: "香港",
+        regionKL: "九龙",
+        regionTW: "荃湾",
+        regionTM: "屯门",
+        regionTMK: "屯门（汀九－大榄角）",
+        liveDefault: "屯门公路－大榄角段 [TR114F]",
+        sourceBus: "巴士到站：城巴开放数据（DATA.GOV.HK）· 站点 003261。",
+        sourceOther: "天气：中国气象局 CMA · 汇率：open.er-api.com · 交通：运输署 / 香港出行易。",
+        distanceNote: "距站距离按 25 公里/小时由预计到站时间推算，仅供参考。"
+      },
+      "zh-Hant": {
+        title: "B3A · 富泰邨 → 深圳灣口岸",
+        routeEyebrow: "城巴 · 實時看板",
+        routeTitle: "富泰邨 → 深圳灣口岸",
+        routeMeta: "B3A 線 · 站點 003261 · 富泰邨，青山公路",
+        boardEyebrow: "下一班",
+        boardTitle: "B3A · 富泰邨",
+        statusConnecting: "正在連接城巴開放數據…",
+        statusLive: "實時 · 城巴開放數據",
+        statusError: "連接異常 · 正在重試",
+        statusUpdated: "更新於",
+        updatedNever: "尚未更新",
+        refreshNow: "立即刷新",
+        refreshing: "刷新中…",
+        emptyLoading: "正在讀取班次…",
+        emptyNone: "暫時沒有即將到站的班次。",
+        emptyError: "實時數據暫時不可用。",
+        toDestination: "深圳灣口岸",
+        stopLabel: "富泰邨，青山公路",
+        due: "即將到站",
+        minuteShort: "分鐘",
+        etaUnknown: "—",
+        approxDistance: "距站約 {km} 公里",
+        weatherTitle: "天氣",
+        weatherNow: "現在",
+        weatherToday: "今天",
+        weatherTomorrow: "明天",
+        weatherDay: "日間",
+        weatherNight: "晚間",
+        weatherMap: "CMA 天氣圖",
+        weatherMapSub: "雷達 · 衛星 · 氣溫",
+        weatherCityHK: "香港",
+        weatherCitySZ: "深圳 · 深圳灣附近",
+        weatherHumidity: "濕度",
+        weatherFeels: "體感",
+        weatherUpdated: "更新",
+        weatherUnavailable: "天氣資料暫時不可用",
+        weatherLoading: "正在讀取天氣…",
+        fxTitle: "匯率",
+        fxUnavailable: "匯率資料暫時不可用",
+        fxLoading: "正在讀取匯率…",
+        fxSource: "open.er-api.com · 僅供參考",
+        fxUpdated: "更新於",
+        trafficEyebrow: "交通資訊",
+        trafficTitle: "交通快拍",
+        trafficCount: "18 個鏡頭",
+        trafficNote: "運輸署官方交通快拍 · 每 30 秒更新",
+        trafficHide: "隱藏",
+        trafficShow: "顯示交通快拍",
+        trafficExpand: "展開",
+        trafficCollapse: "隱藏",
+        trafficToggleHint: "快拍",
+        liveEyebrow: "交通直播",
+        liveTitle: "交通直播",
+        liveNote: "畫面每 15 秒更新。六畫面使用運輸署快拍；官方直播連結會開啟「香港出行易」。",
+        liveHide: "隱藏",
+        liveShow: "顯示交通直播",
+        viewSix: "六畫面",
+        viewSingle: "單畫面",
+        officialWebcast: "官方直播 ↗",
+        regionHK: "香港",
+        regionKL: "九龍",
+        regionTW: "荃灣",
+        regionTM: "屯門",
+        regionTMK: "屯門（汀九－大欖角）",
+        liveDefault: "屯門公路－大欖角段 [TR114F]",
+        sourceBus: "巴士到站：城巴開放數據（DATA.GOV.HK）· 站點 003261。",
+        sourceOther: "天氣：中國氣象局 CMA · 匯率：open.er-api.com · 交通：運輸署 / 香港出行易。",
+        distanceNote: "距站距離按 25 公里/小時由預計到站時間推算，僅供參考。"
+      }
+    };
 
-      let buses = [];
-      let lastUpdated = null;
-      let nextRefreshAt = null;
-      let refreshTimer = null;
-      let loading = false;
-      let lastError = "";
+    let currentLang = localStorage.getItem("b3a-lang") || "en";
+    if (!I18N[currentLang]) currentLang = "en";
+    const T = () => I18N[currentLang];
+    const isEn = () => currentLang === "en";
 
-      const hkTime = (date, seconds = false) => new Intl.DateTimeFormat("en-GB", {
-        timeZone: "Asia/Hong_Kong",
-        hour: "2-digit",
-        minute: "2-digit",
-        ...(seconds ? { second: "2-digit" } : {}),
-        hour12: false
-      }).format(date);
+    const CMA_CODES = {
+      0: { en: "Sunny", sc: "晴", tc: "晴", icon: "☀️" },
+      1: { en: "Cloudy", sc: "多云", tc: "多雲", icon: "⛅" },
+      2: { en: "Overcast", sc: "阴", tc: "陰", icon: "☁️" },
+      3: { en: "Showers", sc: "阵雨", tc: "陣雨", icon: "🌦️" },
+      4: { en: "Thunderstorms", sc: "雷阵雨", tc: "雷陣雨", icon: "⛈️" },
+      5: { en: "Thunderstorms with hail", sc: "雷阵雨伴冰雹", tc: "雷陣雨伴冰雹", icon: "⛈️" },
+      6: { en: "Sleet", sc: "雨夹雪", tc: "雨夾雪", icon: "🌨️" },
+      7: { en: "Light rain", sc: "小雨", tc: "小雨", icon: "🌦️" },
+      8: { en: "Moderate rain", sc: "中雨", tc: "中雨", icon: "🌧️" },
+      9: { en: "Heavy rain", sc: "大雨", tc: "大雨", icon: "🌧️" },
+      10: { en: "Rainstorm", sc: "暴雨", tc: "暴雨", icon: "⛈️" },
+      18: { en: "Fog", sc: "雾", tc: "霧", icon: "🌫️" },
+      29: { en: "Dust", sc: "浮尘", tc: "浮塵", icon: "🌫️" },
+      30: { en: "Sand", sc: "扬沙", tc: "揚沙", icon: "🌫️" },
+      31: { en: "Sandstorm", sc: "强沙尘暴", tc: "強沙塵暴", icon: "🌫️" },
+      32: { en: "Dense fog", sc: "浓雾", tc: "濃霧", icon: "🌫️" },
+      33: { en: "Dense fog", sc: "强浓雾", tc: "強濃霧", icon: "🌫️" },
+      34: { en: "Haze", sc: "霾", tc: "霾", icon: "🌫️" },
+      35: { en: "Moderate haze", sc: "中度霾", tc: "中度霾", icon: "🌫️" },
+      36: { en: "Heavy haze", sc: "重度霾", tc: "重度霾", icon: "🌫️" },
+      37: { en: "Severe haze", sc: "严重霾", tc: "嚴重霾", icon: "🌫️" },
+      38: { en: "Fog", sc: "大雾", tc: "大霧", icon: "🌫️" },
+      39: { en: "Dense fog", sc: "特强浓雾", tc: "特強濃霧", icon: "🌫️" }
+    };
 
-      function parseEta(value) {
-        if (!value) return null;
-        const time = new Date(value).getTime();
-        return Number.isFinite(time) ? time : null;
+    const CURRENCY_NAMES = {
+      en: { USD: "USD", CNY: "CNY", HKD: "HKD" },
+      "zh-Hans": { USD: "美元", CNY: "人民币", HKD: "港币" },
+      "zh-Hant": { USD: "美元", CNY: "人民幣", HKD: "港幣" }
+    };
+
+    const BUS_API_URL = "https://rt.data.gov.hk/v2/transport/citybus/eta/CTB/003261/B3A";
+    const CMA_NOW_URL = "https://weather.cma.cn/api/now/59493";
+    const CMA_SZ_FORECAST_URL = "https://weather.cma.cn/api/weather/59493";
+    const CMA_HK_FORECAST_URL = "https://weather.cma.cn/api/weather/45005";
+    const CMA_MAP_URL = "https://weather.cma.cn/web/weather/map.html";
+    const FX_API_URL = "https://open.er-api.com/v6/latest/USD";
+    const TD_IMAGE_BASE = "https://tdcctv.data.one.gov.hk";
+    const HKE_WEBCAST_BASE = "https://www.hkemobility.gov.hk";
+
+    const REFRESH_BUS_MS = 30000;
+    const REFRESH_WEATHER_MS = 600000;
+    const REFRESH_FX_MS = 3600000;
+    const REFRESH_TRAFFIC_MS = 30000;
+    const REFRESH_WEBCAST_MS = 15000;
+
+    const state = {
+      departures: [],
+      busUpdated: null,
+      busError: false,
+      busLoading: true,
+      weather: { now: null, sz: null, hk: null, error: false, loading: true },
+      fx: { usdCny: null, usdHkd: null, cnyHkd: null, updated: null, error: false, loading: true },
+      trafficExpanded: false,
+      snapshotUserHidden: false,
+      liveUserHidden: false,
+      sixMode: false,
+      region: "tmk"
+    };
+
+    function cam(en, sc, tc) {
+      return { en: en, sc: sc, tc: tc };
+    }
+
+    const CAMERA_META = {
+      TDS90055: cam("Yuen Long Highway near Kong Sham Western Highway – Eastbound (1)", "元朗公路近港深西部公路 - 东行 (1)", "元朗公路近港深西部公路 - 東行 (1)"),
+      AID10101: cam("Kong Sham Western Highway near Fuk Hang Tsuen – Northbound (1)", "港深西部公路近福亨村 - 北行 (1)", "港深西部公路近福亨村 - 北行 (1)"),
+      AID10102: cam("Kong Sham Western Highway near Fuk Hang Tsuen – Northbound (2)", "港深西部公路近福亨村 - 北行 (2)", "港深西部公路近福亨村 - 北行 (2)"),
+      AID10104: cam("Kong Sham Western Highway near Yu Fung Garden – Northbound", "港深西部公路近豫丰花园 - 北行", "港深西部公路近豫豐花園 - 北行"),
+      AID10105: cam("Kong Sham Western Highway near Tsing Yick Road – Northbound", "港深西部公路近青亦路 - 北行", "港深西部公路近青亦路 - 北行"),
+      AID10106: cam("Kong Sham Western Highway near Mak Yuen Wai Road – Northbound", "港深西部公路近麦园围路 - 北行", "港深西部公路近麥園圍路 - 北行"),
+      AID10107: cam("Kong Sham Western Highway near Yik Yuen Road – Northbound (1)", "港深西部公路近亦园路 - 北行 (1)", "港深西部公路近亦園路 - 北行 (1)"),
+      AID10108: cam("Kong Sham Western Highway near Yik Yuen Road – Northbound (2)", "港深西部公路近亦园路 - 北行 (2)", "港深西部公路近亦園路 - 北行 (2)"),
+      AID10109: cam("Kong Sham Western Highway near San Sang San Tsuen – Northbound", "港深西部公路近新生新村 - 北行", "港深西部公路近新生新村 - 北行"),
+      AID10110: cam("Kong Sham Western Highway near Ha Tsuen Road – Northbound", "港深西部公路近厦村路 - 北行", "港深西部公路近廈村路 - 北行"),
+      AID10112: cam("Kong Sham Western Highway near Helicopter Landing Pad – Northbound", "港深西部公路近直升机停机坪 - 北行", "港深西部公路近直升機停機坪 - 北行"),
+      AID10113: cam("Kong Sham Western Highway near Ngo Hom Shek E&M Room – Northbound", "港深西部公路近鳌磡石机电室 - 北行", "港深西部公路近鰲磡石機電室 - 北行"),
+      AID10114: cam("Shenzhen Bay Bridge – Northbound (1)", "深圳湾公路大桥 - 北行 (1)", "深圳灣公路大橋 - 北行 (1)"),
+      AID10115: cam("Shenzhen Bay Bridge – Northbound (2)", "深圳湾公路大桥 - 北行 (2)", "深圳灣公路大橋 - 北行 (2)"),
+      AID10116: cam("Shenzhen Bay Bridge – Northbound (3)", "深圳湾公路大桥 - 北行 (3)", "深圳灣公路大橋 - 北行 (3)"),
+      AID10117: cam("Shenzhen Bay Bridge – Northbound (4)", "深圳湾公路大桥 - 北行 (4)", "深圳灣公路大橋 - 北行 (4)"),
+      AID10118: cam("Shenzhen Bay Bridge – Northbound (5)", "深圳湾公路大桥 - 北行 (5)", "深圳灣公路大橋 - 北行 (5)"),
+      AID10119: cam("Shenzhen Bay Bridge – Northbound (6)", "深圳湾公路大桥 - 北行 (6)", "深圳灣公路大橋 - 北行 (6)"),
+      H106F: cam("Connaught Road Central near Exchange Square", "干诺道中近交易广场", "干諾道中近交易廣場"),
+      H207F: cam("Cross-Harbour Tunnel Hong Kong entrance", "海底隧道香港入口", "海底隧道香港入口"),
+      H904F: cam("Canal Road Flyover near Gloucester Road", "坚拿道天桥近告士打道", "堅拿道天橋近告士打道"),
+      H802F: cam("Island Eastern Corridor near Hoi Yu Street", "东区走廊近海裕街", "東區走廊近海裕街"),
+      H429F: cam("Aberdeen Praya Road near Fish Market", "香港仔海傍道近鱼市场", "香港仔海傍道近魚市場"),
+      H703F: cam("Connaught Road West", "干诺道西", "干諾道西"),
+      K107F: cam("Cross-Harbour Tunnel Kowloon entrance", "海底隧道九龙入口", "海底隧道九龍入口"),
+      K104F: cam("Canton Road near China Hong Kong City", "广东道近中港城", "廣東道近中港城"),
+      K205F: cam("Nathan Road near Lai Chi Kok Road", "弥敦道近荔枝角道", "彌敦道近荔枝角道"),
+      K809F2: cam("Kwun Tong Road near Kowloon Bay MTR Station", "观塘道近九龙湾港铁站", "觀塘道近九龍灣港鐵站"),
+      K901F: cam("Western Harbour Crossing Kowloon entrance", "西区海底隧道九龙入口", "西區海底隧道九龍入口"),
+      K521F: cam("Prince Edward Road East near San Po Kong", "太子道东近新蒲岗", "太子道東近新蒲崗"),
+      TW120F: cam("Tsuen Wan Road near Tai Chung Road", "荃湾路近大涌道", "荃灣路近大涌道"),
+      AID05131: cam("Tsuen Wan Road near Tsuen Wan Driving Test Centre", "荃湾路近荃湾驾驶考试中心", "荃灣路近荃灣駕駛考試中心"),
+      AID05133: cam("Tsuen Wan Road near Tsuen Wan West Station", "荃湾路近港铁荃湾西站", "荃灣路近港鐵荃灣西站"),
+      AID09101: cam("Tuen Mun Road near Tsuen Wan Road – Eastbound", "屯门公路近荃湾路 - 东行", "屯門公路近荃灣路 - 東行"),
+      TR101F: cam("Tuen Mun Road – Chai Wan Kok", "屯门公路-柴湾角", "屯門公路-柴灣角"),
+      TR105F: cam("Tuen Mun Road – Ting Kau", "屯门公路-汀九段", "屯門公路-汀九段"),
+      TR107F: cam("Tuen Mun Road – Sham Tseng", "屯门公路-深井段", "屯門公路-深井段"),
+      TR108F: cam("Tuen Mun Road – Sham Tseng Interchange", "屯门公路-深井交汇处", "屯門公路-深井交匯處"),
+      TR111F: cam("Tuen Mun Road – near Tsing Lung Tau", "屯门公路 -近青龙头", "屯門公路 -近青龍頭"),
+      TR114F: cam("Tuen Mun Road – Tai Lam Kok", "屯门公路-大榄角段", "屯門公路-大欖角段"),
+      TR116F: cam("Tuen Mun Road – Siu Lam", "屯门公路-小榄段", "屯門公路-小欖段")
+    };
+
+    const SNAPSHOT_KEYS = [
+      "TDS90055", "AID10101", "AID10102", "AID10104", "AID10105", "AID10106",
+      "AID10107", "AID10108", "AID10109", "AID10110", "AID10112", "AID10113",
+      "AID10114", "AID10115", "AID10116", "AID10117", "AID10118", "AID10119"
+    ];
+
+    const REGIONS = {
+      hk: { labelKey: "regionHK", cameras: ["H106F", "H207F", "H904F", "H802F", "H429F", "H703F"] },
+      kl: { labelKey: "regionKL", cameras: ["K107F", "K104F", "K205F", "K809F2", "K901F", "K521F"] },
+      tw: { labelKey: "regionTW", cameras: ["TW120F", "AID05131", "AID05133", "AID09101", "TR101F", "TR105F"] },
+      tm: { labelKey: "regionTM", cameras: ["AID10101", "AID10104", "AID10109", "AID10110", "AID10112", "AID10114"] },
+      tmk: { labelKey: "regionTMK", cameras: ["TR105F", "TR107F", "TR108F", "TR111F", "TR114F", "TR116F"] }
+    };
+
+    const DEFAULT_CAMERA = "TR114F";
+
+    function cameraName(key) {
+      const meta = CAMERA_META[key];
+      if (!meta) return key;
+      if (currentLang === "zh-Hans") return meta.sc;
+      if (currentLang === "zh-Hant") return meta.tc;
+      return meta.en;
+    }
+
+    function tdImageUrl(key) {
+      return TD_IMAGE_BASE + "/" + key + ".JPG?t=" + Date.now();
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function getWeatherCode(code, fallback) {
+      const item = CMA_CODES[Number(code)];
+      if (!item) return fallback || "";
+      if (currentLang === "zh-Hans") return item.sc;
+      if (currentLang === "zh-Hant") return item.tc;
+      return item.en;
+    }
+
+    function getWeatherIcon(code) {
+      const item = CMA_CODES[Number(code)];
+      return item ? item.icon : "🌤️";
+    }
+
+    function hkTime(date) {
+      try {
+        return new Intl.DateTimeFormat("en-GB", {
+          timeZone: "Asia/Hong_Kong",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false
+        }).format(date || new Date());
+      } catch (error) {
+        const d = date || new Date();
+        return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+      }
+    }
+
+    function hkClock(date) {
+      try {
+        return new Intl.DateTimeFormat("en-GB", {
+          timeZone: "Asia/Hong_Kong",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false
+        }).format(date || new Date());
+      } catch (error) {
+        const d = date || new Date();
+        return [d.getHours(), d.getMinutes(), d.getSeconds()].map(function (n) { return String(n).padStart(2, "0"); }).join(":");
+      }
+    }
+
+    function trimText(value, max) {
+      const text = String(value || "").trim();
+      if (text.length <= max) return text;
+      return text.slice(0, Math.max(0, max - 1)).trimEnd() + "…";
+    }
+
+    function setupTicker(track, group, direction, seconds) {
+      track.querySelectorAll(".ticker-group.clone").forEach(function (node) { node.remove(); });
+      const clone = group.cloneNode(true);
+      clone.classList.add("clone");
+      clone.setAttribute("aria-hidden", "true");
+      clone.querySelectorAll("a, button").forEach(function (node) { node.tabIndex = -1; });
+      track.appendChild(clone);
+      track.classList.remove("left", "right");
+      track.classList.add(direction);
+      track.style.setProperty("--ticker-duration", String(seconds) + "s");
+    }
+
+    function tickerLoadingCard(text) {
+      return '<span class="ticker-card ticker-loading">' + escapeHtml(text) + '</span>';
+    }
+
+    function formatCmaTime(value) {
+      const text = String(value || "").trim();
+      const match = text.match(/(\d{2}:\d{2})/);
+      return match ? match[1] : "—";
+    }
+
+    function fetchJson(url) {
+      return fetch(url, { cache: "no-store" }).then(function (response) {
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        return response.json();
+      });
+    }
+
+    function renderWeatherTicker() {
+      const group = document.getElementById("weatherGroup");
+      const track = document.getElementById("weatherTrack");
+      if (!group || !track) return;
+
+      if (state.weather.loading && !state.weather.now && !state.weather.hk) {
+        group.innerHTML = tickerLoadingCard(T().weatherLoading);
+        setupTicker(track, group, "left", 48);
+        return;
       }
 
-      function getDisplayBus(bus, now) {
-        const eta = parseEta(bus.eta);
-        if (eta === null) return { ...bus, etaMs: null, diff: Infinity, text: "—", unit: "", state: "unknown" };
-        const diff = eta - now;
-        if (diff <= 30_000 && diff > -90_000) {
-          return { ...bus, etaMs: eta, diff, text: "Due", unit: "", state: "due" };
-        }
-        if (diff <= -90_000) {
-          return { ...bus, etaMs: eta, diff, text: "Departed", unit: "", state: "gone" };
-        }
-        return {
-          ...bus,
-          etaMs: eta,
-          diff,
-          text: String(Math.ceil(diff / 60_000)),
-          unit: "min",
-          state: "upcoming"
+      if (state.weather.error && !state.weather.now && !state.weather.hk) {
+        group.innerHTML = '<span class="ticker-card ticker-loading">' + escapeHtml(T().weatherUnavailable) + '</span>';
+        setupTicker(track, group, "left", 48);
+        return;
+      }
+
+      const nowData = state.weather.now;
+      const szData = state.weather.sz;
+      const hkData = state.weather.hk;
+      const now = nowData && nowData.now ? nowData.now : null;
+      const szDaily = szData && szData.daily ? szData.daily[0] : null;
+      const hkDaily = hkData && hkData.daily ? hkData.daily : [];
+      const today = hkDaily[0] || szDaily || null;
+      const tomorrow = hkDaily[1] || null;
+      const temp = now && Number(now.temperature) !== 9999 ? Number(now.temperature).toFixed(1) : "—";
+      const feels = now && Number(now.feelst) !== 9999 ? Number(now.feelst).toFixed(1) : "—";
+      const humidity = now && Number(now.humidity) !== 9999 ? Number(now.humidity).toFixed(0) : "—";
+      const currentCode = szDaily ? szDaily.dayCode : (today ? today.dayCode : null);
+      const currentText = szDaily ? (szDaily.dayText || "") : (today ? (today.dayText || "") : "");
+      const currentDesc = getWeatherCode(currentCode, currentText);
+      const updated = formatCmaTime((nowData && nowData.lastUpdate) || (szData && szData.lastUpdate) || "");
+
+      const todayHigh = today ? today.high : "—";
+      const todayLow = today ? today.low : "—";
+      const todayDay = today ? getWeatherCode(today.dayCode, today.dayText) : "—";
+      const todayNight = today ? getWeatherCode(today.nightCode, today.nightText) : "—";
+      const tomorrowHigh = tomorrow ? tomorrow.high : "—";
+      const tomorrowLow = tomorrow ? tomorrow.low : "—";
+      const tomorrowDay = tomorrow ? getWeatherCode(tomorrow.dayCode, tomorrow.dayText) : "—";
+      const tomorrowNight = tomorrow ? getWeatherCode(tomorrow.nightCode, tomorrow.nightText) : "—";
+
+      const cards = [
+        '<div class="ticker-card weather-card">' +
+          '<span class="weather-emoji">' + getWeatherIcon(currentCode) + '</span>' +
+          '<span class="ticker-copy"><strong>' + escapeHtml(T().weatherCitySZ) + ' · ' + escapeHtml(temp) + '°C</strong>' +
+          '<small>' + escapeHtml(T().weatherNow) + ' ' + escapeHtml(currentDesc) + ' · ' + escapeHtml(T().weatherHumidity) + ' ' + escapeHtml(humidity) + '% · ' + escapeHtml(T().weatherFeels) + ' ' + escapeHtml(feels) + '°C · ' + escapeHtml(T().weatherUpdated) + ' ' + escapeHtml(updated) + '</small></span>' +
+        '</div>',
+        '<div class="ticker-card weather-card">' +
+          '<span class="weather-emoji">' + getWeatherIcon(today ? today.dayCode : null) + '</span>' +
+          '<span class="ticker-copy"><strong>' + escapeHtml(T().weatherToday) + ' · ' + escapeHtml(T().weatherCityHK) + ' ' + escapeHtml(todayHigh) + '° / ' + escapeHtml(todayLow) + '°</strong>' +
+          '<small>' + escapeHtml(T().weatherDay) + ' ' + escapeHtml(todayDay) + ' · ' + escapeHtml(T().weatherNight) + ' ' + escapeHtml(todayNight) + '</small></span>' +
+        '</div>',
+        '<div class="ticker-card weather-card">' +
+          '<span class="weather-emoji">' + getWeatherIcon(tomorrow ? tomorrow.dayCode : null) + '</span>' +
+          '<span class="ticker-copy"><strong>' + escapeHtml(T().weatherTomorrow) + ' · ' + escapeHtml(T().weatherCityHK) + ' ' + escapeHtml(tomorrowHigh) + '° / ' + escapeHtml(tomorrowLow) + '°</strong>' +
+          '<small>' + escapeHtml(T().weatherDay) + ' ' + escapeHtml(tomorrowDay) + ' · ' + escapeHtml(T().weatherNight) + ' ' + escapeHtml(tomorrowNight) + '</small></span>' +
+        '</div>',
+        '<a class="ticker-card weather-map" href="' + CMA_MAP_URL + '" target="_blank" rel="noopener">' +
+          '<span class="weather-emoji">🗺️</span>' +
+          '<span class="ticker-copy"><strong>' + escapeHtml(T().weatherMap) + '</strong><small>' + escapeHtml(T().weatherMapSub) + '</small></span>' +
+        '</a>'
+      ];
+
+      group.innerHTML = cards.join("");
+      setupTicker(track, group, "left", 48);
+    }
+
+    let weatherTimer = null;
+
+    async function fetchWeather() {
+      if (!state.weather.now && !state.weather.hk) {
+        state.weather.loading = true;
+        renderWeatherTicker();
+      }
+      const results = await Promise.allSettled([
+        fetchJson(CMA_NOW_URL),
+        fetchJson(CMA_SZ_FORECAST_URL),
+        fetchJson(CMA_HK_FORECAST_URL)
+      ]);
+      const now = results[0].status === "fulfilled" ? results[0].value : null;
+      const sz = results[1].status === "fulfilled" ? results[1].value : null;
+      const hk = results[2].status === "fulfilled" ? results[2].value : null;
+      if ((now && now.data) || (sz && sz.data) || (hk && hk.data)) {
+        state.weather = {
+          now: now && now.data ? now.data : state.weather.now,
+          sz: sz && sz.data ? sz.data : state.weather.sz,
+          hk: hk && hk.data ? hk.data : state.weather.hk,
+          error: false,
+          loading: false
         };
+      } else {
+        state.weather.error = true;
+        state.weather.loading = false;
+      }
+      renderWeatherTicker();
+      if (weatherTimer) clearTimeout(weatherTimer);
+      weatherTimer = setTimeout(fetchWeather, REFRESH_WEATHER_MS);
+    }
+
+    function formatRate(value) {
+      const number = Number(value);
+      if (!Number.isFinite(number)) return "—";
+      return number.toFixed(4);
+    }
+
+    function currencyName(code) {
+      const names = CURRENCY_NAMES[currentLang] || CURRENCY_NAMES.en;
+      return names[code] || code;
+    }
+
+    function renderFxTicker() {
+      const group = document.getElementById("fxGroup");
+      const track = document.getElementById("fxTrack");
+      if (!group || !track) return;
+
+      if (state.fx.loading && state.fx.usdCny == null) {
+        group.innerHTML = tickerLoadingCard(T().fxLoading);
+        setupTicker(track, group, "left", 42);
+        return;
       }
 
-      function renderClock(now) {
-        hkClockEl.textContent = hkTime(new Date(now), true);
+      if (state.fx.error && state.fx.usdCny == null) {
+        group.innerHTML = '<span class="ticker-card ticker-loading">' + escapeHtml(T().fxUnavailable) + '</span>';
+        setupTicker(track, group, "left", 42);
+        return;
       }
 
-      function renderDepartures() {
-        const now = Date.now();
-        const live = buses
-          .filter(bus => !bus.dir || bus.dir === "O")
-          .map(bus => getDisplayBus(bus, now))
-          .filter(bus => bus.state !== "gone")
-          .sort((a, b) => (a.etaMs ?? Infinity) - (b.etaMs ?? Infinity))
-          .slice(0, MAX_BUSES);
+      const usdCny = state.fx.usdCny;
+      const usdHkd = state.fx.usdHkd;
+      const cnyHkd = state.fx.cnyHkd;
+      const updated = state.fx.updated ? hkTime(state.fx.updated) : "—";
+      const pairs = [
+        ["USD", "CNY", usdCny],
+        ["USD", "HKD", usdHkd],
+        ["CNY", "HKD", cnyHkd]
+      ];
 
-        if (!live.length) {
-          departuresEl.innerHTML = `
-            <div class="empty">
-              <div class="empty-icon" aria-hidden="true">◷</div>
-              <h3>No upcoming departures</h3>
-              <p>No live B3A buses are currently reported.<br>This board checks again automatically.</p>
-            </div>`;
-          return;
-        }
-
-        departuresEl.innerHTML = live.map((bus, index) => {
-          const isNext = index === 0;
-          const label = isNext ? "Next departure" : `Following bus`;
-          const clock = bus.etaMs ? hkTime(new Date(bus.etaMs)) : "--:--";
-          const subtitle = bus.rmk_en
-            ? bus.rmk_en
-            : (bus.dest_en || "Shenzhen Bay Port");
-          return `
-            <article class="departure${isNext ? " next" : ""}">
-              <div class="departure-label">
-                ${label}
-                <small>${escapeHtml(subtitle)}</small>
-              </div>
-              <div class="countdown ${bus.state}">
-                <strong>${bus.text}</strong>${bus.unit ? `<span>${bus.unit}</span>` : ""}
-              </div>
-              <div class="departure-time"><b>ETA</b>${clock}</div>
-            </article>`;
-        }).join("");
-      }
-
-      function renderMeta() {
-        if (lastUpdated) {
-          const age = Math.max(0, Math.floor((Date.now() - lastUpdated) / 1000));
-          updatedTextEl.textContent = age < 5
-            ? "Updated just now"
-            : `Updated ${age}s ago`;
-        } else {
-          updatedTextEl.textContent = "Waiting for data";
-        }
-
-        if (nextRefreshAt) {
-          const secs = Math.max(0, Math.ceil((nextRefreshAt - Date.now()) / 1000));
-          refreshTextEl.textContent = `Auto-refresh in ${secs}s`;
-        } else {
-          refreshTextEl.textContent = "Auto-refresh every 30 seconds";
-        }
-      }
-
-      function renderStatus() {
-        if (loading) {
-          livePillEl.dataset.state = "loading";
-          liveTextEl.textContent = "Updating";
-        } else if (lastError) {
-          livePillEl.dataset.state = "error";
-          liveTextEl.textContent = "Offline";
-        } else {
-          livePillEl.dataset.state = "live";
-          liveTextEl.textContent = "Live";
-        }
-        errorBarEl.classList.toggle("show", Boolean(lastError));
-        if (lastError) errorTextEl.textContent = lastError;
-      }
-
-      function tick() {
-        const now = Date.now();
-        renderClock(now);
-        renderDepartures();
-        renderMeta();
-      }
-
-      function escapeHtml(str) {
-        return String(str).replace(/[&<>"']/g, c => ({
-          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-        })[c]);
-      }
-
-      async function fetchDepartures() {
-        if (loading) return;
-        loading = true;
-        refreshBtnEl.classList.add("spinning");
-        renderStatus();
-
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 12_000);
-
-        try {
-          const response = await fetch(`${API_URL}?t=${Date.now()}`, {
-            cache: "no-store",
-            signal: controller.signal
-          });
-          if (!response.ok) throw new Error(`Citybus API returned ${response.status}`);
-          const payload = await response.json();
-          if (payload.code) throw new Error(payload.message || "Citybus API error");
-          if (!Array.isArray(payload.data)) throw new Error("Unexpected response from Citybus API");
-
-          buses = payload.data
-            .filter(bus => !bus.dir || bus.dir === "O")
-            .filter(bus => bus.eta)
-            .sort((a, b) => new Date(a.eta) - new Date(b.eta));
-
-          lastUpdated = Date.now();
-          lastError = "";
-        } catch (error) {
-          const aborted = error && error.name === "AbortError";
-          lastError = aborted
-            ? "Connection timed out. Retrying automatically."
-            : `Live data unavailable (${error.message || "network error"}). Retrying automatically.`;
-        } finally {
-          clearTimeout(timeout);
-          loading = false;
-          nextRefreshAt = Date.now() + REFRESH_MS;
-          refreshBtnEl.classList.remove("spinning");
-          renderStatus();
-          tick();
-          clearTimeout(refreshTimer);
-          refreshTimer = setTimeout(fetchDepartures, REFRESH_MS);
-        }
-      }
-
-      refreshBtnEl.addEventListener("click", () => {
-        if (!loading) fetchDepartures();
+      const cards = pairs.map(function (pair) {
+        const base = pair[0];
+        const quote = pair[1];
+        const rate = formatRate(pair[2]);
+        return '<div class="ticker-card fx-card">' +
+          '<span class="fx-pair">' + base + '/' + quote + '</span>' +
+          '<span class="fx-rate">' + rate + '</span>' +
+          '<span class="ticker-copy"><small>1 ' + escapeHtml(currencyName(base)) + ' = ' + rate + ' ' + escapeHtml(currencyName(quote)) + '</small></span>' +
+        '</div>';
       });
 
-      tick();
-      fetchDepartures();
-      setInterval(tick, 1_000);
-    })();
+      cards.push('<div class="ticker-card fx-meta">' +
+        '<span class="ticker-copy"><strong>USD · CNY · HKD</strong><small>' + escapeHtml(T().fxSource) + ' · ' + escapeHtml(T().fxUpdated) + ' ' + escapeHtml(updated) + '</small></span>' +
+      '</div>');
+
+      group.innerHTML = cards.join("");
+      setupTicker(track, group, "left", 42);
+    }
+
+    let fxTimer = null;
+
+    async function fetchFx() {
+      if (state.fx.usdCny == null) {
+        state.fx.loading = true;
+        renderFxTicker();
+      }
+      try {
+        const data = await fetchJson(FX_API_URL);
+        if (!data || data.result !== "success" || !data.rates) throw new Error("Bad FX response");
+        const usdCny = Number(data.rates.CNY);
+        const usdHkd = Number(data.rates.HKD);
+        if (!Number.isFinite(usdCny) || !Number.isFinite(usdHkd) || usdCny <= 0) throw new Error("Bad FX rates");
+        state.fx = {
+          usdCny: usdCny,
+          usdHkd: usdHkd,
+          cnyHkd: usdHkd / usdCny,
+          updated: data.time_last_update_utc ? new Date(data.time_last_update_utc) : new Date(),
+          error: false,
+          loading: false
+        };
+      } catch (error) {
+        state.fx.error = true;
+        state.fx.loading = false;
+      }
+      renderFxTicker();
+      if (fxTimer) clearTimeout(fxTimer);
+      fxTimer = setTimeout(fetchFx, REFRESH_FX_MS);
+    }
+
+    function snapshotCard(key, index) {
+      const name = cameraName(key);
+      const url = TD_IMAGE_BASE + "/" + key + ".JPG";
+      const num = String(index + 1).padStart(2, "0");
+      return '<a class="snapshot-card" href="' + url + '" target="_blank" rel="noopener" aria-label="' + escapeHtml(name) + '">' +
+        '<img data-camera="' + key + '" src="' + tdImageUrl(key) + '" alt="" loading="eager">' +
+        '<span class="snap-text"><strong>' + num + ' · ' + escapeHtml(name) + '</strong><small>' + key + '</small></span>' +
+      '</a>';
+    }
+
+    function trafficToggleCard() {
+      const expanded = state.trafficExpanded;
+      const label = expanded ? T().trafficCollapse : T().trafficExpand;
+      const sign = expanded ? "−" : "+";
+      return '<button class="snapshot-toggle" type="button" data-action="toggle-traffic" aria-expanded="' + (expanded ? "true" : "false") + '">' +
+        '<span>' + sign + '</span>' + escapeHtml(label) + '<small>' + escapeHtml(T().trafficToggleHint) + '</small>' +
+      '</button>';
+    }
+
+    function renderTrafficTicker() {
+      const group = document.getElementById("trafficGroup");
+      const track = document.getElementById("trafficTrack");
+      if (!group || !track) return;
+
+      const indices = state.trafficExpanded
+        ? SNAPSHOT_KEYS.map(function (_, index) { return index; })
+        : [0, 1, 2, 15, 16, 17];
+
+      const items = [];
+      indices.forEach(function (index, position) {
+        if (position === 3) items.push(trafficToggleCard());
+        items.push(snapshotCard(SNAPSHOT_KEYS[index], index));
+      });
+      if (indices.length <= 3) items.push(trafficToggleCard());
+
+      group.innerHTML = items.join("");
+      setupTicker(track, group, "right", state.trafficExpanded ? 190 : 82);
+
+      const heading = document.getElementById("trafficHeading");
+      if (heading) heading.innerHTML = escapeHtml(T().trafficTitle) + ' <span>' + escapeHtml(T().trafficCount) + '</span>';
+      const note = document.getElementById("trafficNote");
+      if (note) note.textContent = T().trafficNote;
+      const hideBtn = document.getElementById("trafficHideBtn");
+      if (hideBtn) hideBtn.textContent = T().trafficHide;
+      const restore = document.getElementById("trafficRestore");
+      if (restore) restore.textContent = T().trafficShow;
+      updateSectionVisibility();
+    }
+
+    function refreshTrafficImages() {
+      const stamp = Date.now();
+      document.querySelectorAll('#trafficTrack img[data-camera]').forEach(function (img) {
+        img.src = TD_IMAGE_BASE + "/" + img.getAttribute("data-camera") + ".JPG?t=" + stamp;
+      });
+    }
+
+    function updateSectionVisibility() {
+      const trafficSection = document.getElementById("trafficSection");
+      const trafficRestore = document.getElementById("trafficRestore");
+      const liveSection = document.getElementById("liveSection");
+      const liveRestore = document.getElementById("liveRestore");
+      if (trafficSection) trafficSection.hidden = state.snapshotUserHidden || state.sixMode;
+      if (trafficRestore) trafficRestore.hidden = !(state.snapshotUserHidden && !state.sixMode);
+      if (liveSection) liveSection.hidden = state.liveUserHidden;
+      if (liveRestore) liveRestore.hidden = !state.liveUserHidden;
+    }
+
+    function webcastTile(key) {
+      const name = cameraName(key);
+      return '<figure class="webcast-tile">' +
+        '<img data-camera="' + key + '" src="' + tdImageUrl(key) + '" alt="' + escapeHtml(name) + '" loading="lazy">' +
+        '<figcaption><span>' + escapeHtml(name) + '</span><small>' + key + '</small></figcaption>' +
+      '</figure>';
+    }
+
+    function renderWebcast() {
+      const grid = document.getElementById("webcastGrid");
+      const regionSwitch = document.getElementById("regionSwitch");
+      const viewToggle = document.getElementById("viewToggle");
+      const officialLink = document.getElementById("officialLink");
+      const liveHeading = document.getElementById("liveHeading");
+      const liveEyebrow = document.getElementById("liveEyebrow");
+      const liveNote = document.getElementById("liveNote");
+      const liveHideBtn = document.getElementById("liveHideBtn");
+      const liveRestore = document.getElementById("liveRestore");
+      const t = T();
+      if (!grid) return;
+
+      const single = !state.sixMode;
+      const keys = single ? [DEFAULT_CAMERA] : (REGIONS[state.region] || REGIONS.tmk).cameras;
+      grid.className = "webcast-grid " + (single ? "single" : "six");
+      grid.innerHTML = keys.map(webcastTile).join("");
+
+      if (regionSwitch) regionSwitch.hidden = single;
+      if (viewToggle) {
+        viewToggle.textContent = single ? t.viewSix : t.viewSingle;
+        viewToggle.setAttribute("aria-pressed", state.sixMode ? "true" : "false");
+      }
+      if (liveHeading) liveHeading.textContent = t.liveTitle;
+      if (liveEyebrow) liveEyebrow.textContent = t.liveEyebrow;
+      if (liveNote) liveNote.textContent = t.liveNote;
+      if (liveHideBtn) liveHideBtn.textContent = t.liveHide;
+      if (liveRestore) liveRestore.textContent = t.liveShow;
+      if (officialLink) {
+        const langPath = currentLang === "zh-Hans" ? "sc" : currentLang === "zh-Hant" ? "tc" : "en";
+        officialLink.href = HKE_WEBCAST_BASE + "/" + langPath + "/traffic-information/live/webcast";
+        officialLink.textContent = t.officialWebcast;
+      }
+
+      document.querySelectorAll("#regionSwitch .region-btn").forEach(function (button) {
+        const code = button.getAttribute("data-region");
+        const region = REGIONS[code];
+        if (region) button.textContent = t[region.labelKey] || code;
+        button.setAttribute("aria-pressed", code === state.region ? "true" : "false");
+      });
+
+      updateSectionVisibility();
+      refreshWebcastImages();
+    }
+
+    function refreshWebcastImages() {
+      const stamp = Date.now();
+      document.querySelectorAll('#webcastGrid img[data-camera]').forEach(function (img) {
+        img.src = TD_IMAGE_BASE + "/" + img.getAttribute("data-camera") + ".JPG?t=" + stamp;
+      });
+    }
+
+    function minutesUntil(iso) {
+      if (!iso) return null;
+      const time = new Date(iso).getTime();
+      if (!Number.isFinite(time)) return null;
+      return Math.max(0, Math.round((time - Date.now()) / 60000));
+    }
+
+    function distanceToStop(minutes) {
+      if (minutes == null) return "—";
+      return ((minutes / 60) * 25).toFixed(1);
+    }
+
+    function renderBus() {
+      const t = T();
+      const list = document.getElementById("departureList");
+      const statusDot = document.getElementById("statusDot");
+      const statusText = document.getElementById("statusText");
+      const updatedText = document.getElementById("updatedText");
+      const refreshButton = document.getElementById("refreshButton");
+      if (!list) return;
+
+      if (statusDot) statusDot.classList.toggle("bad", state.busError);
+      if (statusText) {
+        statusText.textContent = state.busError ? t.statusError : state.busLoading ? t.statusConnecting : t.statusLive;
+      }
+      if (updatedText) {
+        updatedText.textContent = state.busUpdated ? t.statusUpdated + " " + hkClock(new Date(state.busUpdated)) : t.updatedNever;
+      }
+      if (refreshButton) {
+        refreshButton.disabled = state.busLoading;
+        refreshButton.textContent = state.busLoading ? t.refreshing : t.refreshNow;
+      }
+
+      if (state.busLoading && (!state.departures || state.departures.length === 0)) {
+        list.innerHTML = '<div class="empty">' + escapeHtml(t.emptyLoading) + '</div>';
+        return;
+      }
+      if (state.busError && (!state.departures || state.departures.length === 0)) {
+        list.innerHTML = '<div class="empty">' + escapeHtml(t.emptyError) + '</div>';
+        return;
+      }
+      if (!state.departures || state.departures.length === 0) {
+        list.innerHTML = '<div class="empty">' + escapeHtml(t.emptyNone) + '</div>';
+        return;
+      }
+
+      list.innerHTML = state.departures.slice(0, 6).map(function (item) {
+        const minutes = minutesUntil(item.eta);
+        const etaLabel = minutes == null ? t.etaUnknown : minutes <= 0 ? t.due : String(minutes);
+        const etaTime = item.eta ? hkTime(new Date(item.eta)) : "—";
+        const km = distanceToStop(minutes);
+        const distance = km === "—" ? t.etaUnknown : t.approxDistance.replace("{km}", km);
+        return '<div class="departure">' +
+          '<div class="eta">' + escapeHtml(etaLabel) + '</div>' +
+          '<div class="departure-main"><strong>B3A · ' + escapeHtml(t.toDestination) + '</strong>' +
+          '<small>' + escapeHtml(t.stopLabel) + ' · ' + escapeHtml(etaTime) + '</small></div>' +
+          '<div class="departure-side"><strong>≈ ' + escapeHtml(km) + ' km</strong><span>' + escapeHtml(distance) + '</span></div>' +
+        '</div>';
+      }).join("");
+    }
+
+    let busFetching = false;
+
+    async function fetchBus() {
+      if (busFetching) return;
+      busFetching = true;
+      state.busLoading = true;
+      renderBus();
+      try {
+        const data = await fetchJson(BUS_API_URL);
+        const rows = Array.isArray(data && data.data) ? data.data : [];
+        state.departures = rows
+          .filter(function (item) { return item && item.eta; })
+          .sort(function (a, b) { return new Date(a.eta) - new Date(b.eta); });
+        state.busUpdated = new Date();
+        state.busError = false;
+      } catch (error) {
+        state.busError = true;
+      }
+      state.busLoading = false;
+      busFetching = false;
+      renderBus();
+    }
+
+    function applyLanguage(lang) {
+      if (!I18N[lang]) lang = "en";
+      currentLang = lang;
+      localStorage.setItem("b3a-lang", lang);
+      const t = T();
+
+      document.documentElement.lang = lang;
+      document.title = t.title;
+      document.getElementById("routeEyebrow").textContent = t.routeEyebrow;
+      document.getElementById("routeTitle").textContent = t.routeTitle;
+      document.getElementById("routeMeta").textContent = t.routeMeta;
+      document.getElementById("boardEyebrow").textContent = t.boardEyebrow;
+      document.getElementById("boardTitle").textContent = t.boardTitle;
+      document.getElementById("weatherTicker").setAttribute("aria-label", t.weatherTitle);
+      document.getElementById("fxTicker").setAttribute("aria-label", t.fxTitle);
+      document.getElementById("trafficEyebrow").textContent = t.trafficEyebrow;
+      document.getElementById("liveEyebrow").textContent = t.liveEyebrow;
+      document.getElementById("liveHeading").textContent = t.liveTitle;
+      document.getElementById("trafficNote").textContent = t.trafficNote;
+      document.getElementById("liveNote").textContent = t.liveNote;
+      document.getElementById("trafficHideBtn").textContent = t.trafficHide;
+      document.getElementById("liveHideBtn").textContent = t.liveHide;
+      document.getElementById("trafficRestore").textContent = t.trafficShow;
+      document.getElementById("liveRestore").textContent = t.liveShow;
+      document.getElementById("sourceLine").innerHTML = escapeHtml(t.sourceBus).replace(
+        "DATA.GOV.HK",
+        '<a href="https://data.gov.hk/" target="_blank" rel="noopener">DATA.GOV.HK</a>'
+      );
+      document.getElementById("sourceLine2").innerHTML = escapeHtml(t.sourceOther)
+        .replace("CMA", '<a href="' + CMA_MAP_URL + '" target="_blank" rel="noopener">CMA</a>')
+        .replace("open.er-api.com", '<a href="https://open.er-api.com/" target="_blank" rel="noopener">open.er-api.com</a>')
+        .replace("HKeMobility", '<a href="' + HKE_WEBCAST_BASE + '" target="_blank" rel="noopener">HKeMobility</a>');
+      document.getElementById("distanceNote").textContent = t.distanceNote;
+
+      document.querySelectorAll(".lang-btn").forEach(function (button) {
+        button.setAttribute("aria-pressed", button.getAttribute("data-lang") === currentLang ? "true" : "false");
+      });
+
+      renderWeatherTicker();
+      renderFxTicker();
+      renderTrafficTicker();
+      renderWebcast();
+      renderBus();
+      updateSectionVisibility();
+    }
+
+    function initEvents() {
+      document.querySelectorAll(".lang-btn").forEach(function (button) {
+        button.addEventListener("click", function () {
+          applyLanguage(button.getAttribute("data-lang"));
+        });
+      });
+
+      document.getElementById("refreshButton").addEventListener("click", fetchBus);
+
+      document.getElementById("trafficHideBtn").addEventListener("click", function () {
+        state.snapshotUserHidden = true;
+        updateSectionVisibility();
+      });
+      document.getElementById("trafficRestore").addEventListener("click", function () {
+        state.snapshotUserHidden = false;
+        updateSectionVisibility();
+      });
+      document.getElementById("liveHideBtn").addEventListener("click", function () {
+        state.liveUserHidden = true;
+        updateSectionVisibility();
+      });
+      document.getElementById("liveRestore").addEventListener("click", function () {
+        state.liveUserHidden = false;
+        updateSectionVisibility();
+      });
+
+      document.getElementById("trafficSection").addEventListener("click", function (event) {
+        const toggle = event.target.closest('[data-action="toggle-traffic"]');
+        if (!toggle) return;
+        state.trafficExpanded = !state.trafficExpanded;
+        renderTrafficTicker();
+      });
+
+      document.getElementById("viewToggle").addEventListener("click", function () {
+        state.sixMode = !state.sixMode;
+        renderWebcast();
+      });
+
+      document.getElementById("regionSwitch").addEventListener("click", function (event) {
+        const button = event.target.closest("[data-region]");
+        if (!button) return;
+        const code = button.getAttribute("data-region");
+        if (!REGIONS[code]) return;
+        state.region = code;
+        renderWebcast();
+      });
+    }
+
+    function init() {
+      applyLanguage(currentLang);
+      initEvents();
+
+      const clock = document.getElementById("clock");
+      function updateClock() {
+        clock.textContent = hkClock(new Date()) + " HKT";
+      }
+      updateClock();
+      setInterval(updateClock, 1000);
+
+      fetchBus();
+      fetchWeather();
+      fetchFx();
+
+      setInterval(function () {
+        if (!document.hidden) fetchBus();
+      }, REFRESH_BUS_MS);
+
+      setInterval(function () {
+        if (!document.hidden) renderBus();
+      }, 15000);
+
+      setInterval(function () {
+        const section = document.getElementById("trafficSection");
+        if (!document.hidden && section && !section.hidden) refreshTrafficImages();
+      }, REFRESH_TRAFFIC_MS);
+
+      setInterval(function () {
+        const section = document.getElementById("liveSection");
+        if (!document.hidden && section && !section.hidden) refreshWebcastImages();
+      }, REFRESH_WEBCAST_MS);
+    }
+
+    init();
   </script>
 </body>
 </html>
