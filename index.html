@@ -743,6 +743,89 @@
     .webcast-grid.single { grid-template-columns: 1fr; }
     .webcast-grid.six { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
+    .webcast-tile.live-link {
+      display: block;
+      color: var(--text);
+      text-decoration: none;
+      background:
+        radial-gradient(120% 90% at 100% 0%, rgba(226, 98, 15, 0.16), transparent 55%),
+        linear-gradient(150deg, rgba(255, 252, 244, 0.96), rgba(247, 231, 207, 0.9));
+      transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .webcast-tile.live-link:hover {
+      border-color: rgba(226, 98, 15, 0.42);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(122, 66, 20, 0.11);
+    }
+
+    .live-link-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      aspect-ratio: 16 / 9;
+      padding: 10px;
+    }
+
+    .live-link-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 7px;
+      border: 1px solid rgba(46, 139, 99, 0.25);
+      border-radius: 999px;
+      background: rgba(46, 139, 99, 0.08);
+      color: var(--green);
+      font-size: 7.5px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .live-badge .dot { width: 5px; height: 5px; }
+
+    .live-link-index { color: var(--muted); font-size: 8px; font-weight: 800; letter-spacing: 0.08em; }
+
+    .live-link-main { display: block; min-width: 0; }
+
+    .live-link-title {
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      font-size: 13px;
+      font-weight: 850;
+      line-height: 1.15;
+    }
+
+    .live-link-sub {
+      display: -webkit-box;
+      overflow: hidden;
+      margin-top: 4px;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      color: var(--muted);
+      font-size: 8px;
+      line-height: 1.35;
+    }
+
+    .live-link-action {
+      display: inline-flex;
+      align-items: center;
+      align-self: flex-start;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(226, 98, 15, 0.1);
+      color: var(--accent);
+      font-size: 8px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
     .webcast-tile {
       position: relative;
       margin: 0;
@@ -806,21 +889,54 @@
 
     .view-toggle:hover { filter: brightness(1.04); }
 
-    .region-switch { display: flex; gap: 5px; flex-wrap: wrap; }
+    .live-control-note { color: var(--muted); font-size: 9.5px; line-height: 1.4; }
 
-    .region-btn {
+    .live-picker {
+      margin: 10px 12px 0;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 250, 240, 0.72);
+    }
+
+    .picker-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 9px; }
+    .picker-head strong { font-size: 12px; }
+
+    .picker-close {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
       border: 1px solid var(--line-strong);
-      border-radius: 999px;
-      background: rgba(255, 252, 244, 0.72);
+      border-radius: 50%;
+      background: rgba(255, 252, 244, 0.8);
       color: var(--muted);
-      padding: 6px 9px;
       font: inherit;
-      font-size: 9.5px;
-      font-weight: 800;
+      font-size: 16px;
+      line-height: 1;
       cursor: pointer;
     }
 
-    .region-btn[aria-pressed="true"] { border-color: var(--accent); background: rgba(226, 98, 15, 0.11); color: var(--accent); }
+    .picker-close:hover { border-color: var(--accent); color: var(--accent); }
+
+    .picker-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .picker-row { display: grid; gap: 4px; min-width: 0; }
+    .picker-row span { color: var(--muted); font-size: 8.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+
+    .picker-row select {
+      width: 100%;
+      min-width: 0;
+      padding: 7px 8px;
+      border: 1px solid var(--line-strong);
+      border-radius: 9px;
+      background: rgba(255, 252, 244, 0.9);
+      color: var(--text);
+      font: inherit;
+      font-size: 10.5px;
+      font-weight: 650;
+    }
+
+    .picker-row select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
     .source {
       margin: 18px 2px 0;
@@ -857,6 +973,11 @@
       .webcast-grid.six { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .webcast-grid { padding: 0 9px; }
       .live-controls { padding-left: 9px; padding-right: 9px; }
+      .live-picker { margin-left: 9px; margin-right: 9px; }
+      .picker-grid { grid-template-columns: 1fr; }
+      .live-link-body { gap: 7px; padding: 8px; }
+      .live-link-title { font-size: 11.5px; }
+      .live-link-sub { font-size: 7.5px; }
       .section-note { padding-left: 12px; padding-right: 12px; }
       .snapshot-card { width: 180px; }
       .snapshot-toggle { width: 84px; }
@@ -987,19 +1108,22 @@
         </div>
       </div>
 
-      <div class="webcast-grid single" id="webcastGrid"></div>
+      <div class="webcast-grid six" id="webcastGrid"></div>
 
       <div class="live-controls">
-        <button class="view-toggle" id="viewToggle" type="button" aria-pressed="false">Six views</button>
-        <div class="region-switch" id="regionSwitch" hidden>
-          <button class="region-btn" type="button" data-region="hk" aria-pressed="false">Hong Kong</button>
-          <button class="region-btn" type="button" data-region="kl" aria-pressed="false">Kowloon</button>
-          <button class="region-btn" type="button" data-region="tw" aria-pressed="false">Tsuen Wan</button>
-          <button class="region-btn" type="button" data-region="tm" aria-pressed="false">Tuen Mun</button>
-          <button class="region-btn" type="button" data-region="tmk" aria-pressed="true">Tuen Mun (Ting Kau–Tai Lam Kok)</button>
-        </div>
+        <button class="view-toggle" id="pickerToggle" type="button" aria-expanded="false" aria-controls="livePicker">Choose</button>
+        <span class="live-control-note" id="liveControlNote">Official HKeMobility live webcast links</span>
       </div>
-      <p class="section-note" id="liveNote">Images refresh every 15 seconds. Six-view uses TD snapshots; the stream link opens HKeMobility.</p>
+
+      <div class="live-picker" id="livePicker" hidden>
+        <div class="picker-head">
+          <strong id="pickerTitle">Choose a region for each screen</strong>
+          <button class="picker-close" id="pickerClose" type="button" aria-label="Close">×</button>
+        </div>
+        <div class="picker-grid" id="pickerGrid"></div>
+      </div>
+
+      <p class="section-note" id="liveNote">Official live links only. Each screen opens the HKeMobility webcast in a new tab; nothing refreshes automatically.</p>
     </section>
     <button class="restore-bar" id="liveRestore" type="button" hidden>Show live traffic</button>
 
@@ -1081,18 +1205,26 @@
         trafficToggleHint: "snapshots",
         liveEyebrow: "Live traffic",
         liveTitle: "Live traffic",
-        liveNote: "Images refresh every 15 seconds. Six-view uses TD snapshots; the stream link opens HKeMobility.",
+        liveNote: "Official live links only. Each screen opens the HKeMobility webcast in a new tab; nothing refreshes automatically.",
         liveHide: "Hide",
         liveShow: "Show live traffic",
-        viewSix: "Six views",
-        viewSingle: "Single view",
+        liveControlNote: "Official HKeMobility live webcast links",
+        choose: "Choose",
+        chooseAria: "Choose a region for each live screen",
+        pickerTitle: "Choose a region for each screen",
+        pickerClose: "Close",
+        screen: "Screen {n}",
+        regionSelectAria: "Region for screen {n}",
+        officialLive: "Official live",
+        openLive: "Open official live ↗",
+        liveLinkHint: "Opens HKeMobility in a new tab",
+        liveLinkAria: "Open the official {region} live webcast in a new tab",
         officialWebcast: "Official webcast ↗",
         regionHK: "Hong Kong",
         regionKL: "Kowloon",
         regionTW: "Tsuen Wan",
         regionTM: "Tuen Mun",
         regionTMK: "Tuen Mun (Ting Kau–Tai Lam Kok)",
-        liveDefault: "Tuen Mun Road – Tai Lam Kok [TR114F]",
         sourceBus: "Bus ETA: Citybus open data via DATA.GOV.HK · Stop 003261.",
         sourceOther: "Weather: Hong Kong Observatory · Map: CMA · FX: open.er-api.com · Traffic: TD / HKeMobility.",
         distanceNote: "Distance to stop is approximated from the ETA at 25 km/h."
@@ -1163,18 +1295,26 @@
         trafficToggleHint: "快拍",
         liveEyebrow: "交通直播",
         liveTitle: "交通直播",
-        liveNote: "画面每 15 秒更新。六画面使用运输署快拍；官方直播链接会打开「香港出行易」。",
+        liveNote: "仅提供官方直播链接。每个画面会在新标签页打开「香港出行易」官方直播，不会自动刷新画面。",
         liveHide: "隐藏",
         liveShow: "显示交通直播",
-        viewSix: "六画面",
-        viewSingle: "单画面",
+        liveControlNote: "香港出行易官方直播链接",
+        choose: "选择",
+        chooseAria: "为六个直播画面选择区域",
+        pickerTitle: "为每个画面选择区域",
+        pickerClose: "关闭",
+        screen: "画面 {n}",
+        regionSelectAria: "画面 {n} 的区域",
+        officialLive: "官方直播",
+        openLive: "打开官方直播 ↗",
+        liveLinkHint: "将在新标签页打开「香港出行易」",
+        liveLinkAria: "在新标签页打开{region}官方直播",
         officialWebcast: "官方直播 ↗",
         regionHK: "香港",
         regionKL: "九龙",
         regionTW: "荃湾",
         regionTM: "屯门",
         regionTMK: "屯门（汀九－大榄角）",
-        liveDefault: "屯门公路－大榄角段 [TR114F]",
         sourceBus: "巴士到站：城巴开放数据（DATA.GOV.HK）· 站点 003261。",
         sourceOther: "天气：香港天文台 · 天气图：CMA · 汇率：open.er-api.com · 交通：运输署 / 香港出行易。",
         distanceNote: "距站距离按 25 公里/小时由预计到站时间推算，仅供参考。"
@@ -1245,18 +1385,26 @@
         trafficToggleHint: "快拍",
         liveEyebrow: "交通直播",
         liveTitle: "交通直播",
-        liveNote: "畫面每 15 秒更新。六畫面使用運輸署快拍；官方直播連結會開啟「香港出行易」。",
+        liveNote: "僅提供官方直播連結。每個畫面會在新分頁開啟「香港出行易」官方直播，不會自動刷新畫面。",
         liveHide: "隱藏",
         liveShow: "顯示交通直播",
-        viewSix: "六畫面",
-        viewSingle: "單畫面",
+        liveControlNote: "香港出行易官方直播連結",
+        choose: "選擇",
+        chooseAria: "為六個直播畫面選擇區域",
+        pickerTitle: "為每個畫面選擇區域",
+        pickerClose: "關閉",
+        screen: "畫面 {n}",
+        regionSelectAria: "畫面 {n} 的區域",
+        officialLive: "官方直播",
+        openLive: "開啟官方直播 ↗",
+        liveLinkHint: "會在新分頁開啟「香港出行易」",
+        liveLinkAria: "在新分頁開啟{region}官方直播",
         officialWebcast: "官方直播 ↗",
         regionHK: "香港",
         regionKL: "九龍",
         regionTW: "荃灣",
         regionTM: "屯門",
         regionTMK: "屯門（汀九－大欖角）",
-        liveDefault: "屯門公路－大欖角段 [TR114F]",
         sourceBus: "巴士到站：城巴開放數據（DATA.GOV.HK）· 站點 003261。",
         sourceOther: "天氣：香港天文台 · 天氣圖：CMA · 匯率：open.er-api.com · 交通：運輸署 / 香港出行易。",
         distanceNote: "距站距離按 25 公里/小時由預計到站時間推算，僅供參考。"
@@ -1314,7 +1462,9 @@
     const REFRESH_WEATHER_MS = 600000;
     const REFRESH_FX_MS = 3600000;
     const REFRESH_TRAFFIC_MS = 30000;
-    const REFRESH_WEBCAST_MS = 15000;
+
+    const REGION_ORDER = ["hk", "kl", "tw", "tm", "tmk"];
+    const DEFAULT_LIVE_REGIONS = ["hk", "kl", "tw", "tm", "tmk", "tmk"];
 
     const state = {
       departures: [],
@@ -1327,8 +1477,8 @@
       trafficExpanded: false,
       snapshotUserHidden: false,
       liveUserHidden: false,
-      sixMode: false,
-      region: "tmk"
+      liveRegions: DEFAULT_LIVE_REGIONS.slice(),
+      pickerOpen: false
     };
 
     function cam(en, sc, tc) {
@@ -1393,7 +1543,22 @@
       tmk: { labelKey: "regionTMK", cameras: ["TR105F", "TR107F", "TR108F", "TR111F", "TR114F", "TR116F"] }
     };
 
-    const DEFAULT_CAMERA = "TR114F";
+    function loadLiveRegions() {
+      try {
+        const saved = JSON.parse(localStorage.getItem("b3a-live-regions") || "null");
+        if (Array.isArray(saved) && saved.length === 6 && saved.every(function (code) {
+          return REGION_ORDER.indexOf(code) !== -1;
+        })) {
+          return saved;
+        }
+      } catch (error) {}
+      return DEFAULT_LIVE_REGIONS.slice();
+    }
+
+    function officialWebcastUrl() {
+      const langPath = currentLang === "zh-Hans" ? "sc" : currentLang === "zh-Hant" ? "tc" : "en";
+      return HKE_WEBCAST_BASE + "/" + langPath + "/traffic-information/live/webcast";
+    }
 
     function cameraName(key) {
       const meta = CAMERA_META[key];
@@ -1785,24 +1950,41 @@
       const trafficRestore = document.getElementById("trafficRestore");
       const liveSection = document.getElementById("liveSection");
       const liveRestore = document.getElementById("liveRestore");
-      if (trafficSection) trafficSection.hidden = state.snapshotUserHidden || state.sixMode;
-      if (trafficRestore) trafficRestore.hidden = !(state.snapshotUserHidden && !state.sixMode);
+      if (trafficSection) trafficSection.hidden = state.snapshotUserHidden;
+      if (trafficRestore) trafficRestore.hidden = !state.snapshotUserHidden;
       if (liveSection) liveSection.hidden = state.liveUserHidden;
       if (liveRestore) liveRestore.hidden = !state.liveUserHidden;
     }
 
-    function webcastTile(key) {
-      const name = cameraName(key);
-      return '<figure class="webcast-tile">' +
-        '<img data-camera="' + key + '" src="' + tdImageUrl(key) + '" alt="' + escapeHtml(name) + '" loading="lazy">' +
-        '<figcaption><span>' + escapeHtml(name) + '</span><small>' + key + '</small></figcaption>' +
-      '</figure>';
+    function liveLinkTile(code, index) {
+      const t = T();
+      const region = REGIONS[code] || REGIONS.tmk;
+      const regionName = t[region.labelKey] || code;
+      const href = officialWebcastUrl();
+      const aria = t.liveLinkAria.replace("{region}", regionName);
+      return '<a class="webcast-tile live-link" href="' + href + '" target="_blank" rel="noopener" aria-label="' + escapeHtml(aria) + '">' +
+        '<span class="live-link-body">' +
+          '<span class="live-link-top">' +
+            '<span class="live-badge"><span class="dot"></span>' + escapeHtml(t.officialLive) + '</span>' +
+            '<span class="live-link-index">' + String(index + 1).padStart(2, "0") + '</span>' +
+          '</span>' +
+          '<span class="live-link-main">' +
+            '<span class="live-link-title">' + escapeHtml(regionName) + '</span>' +
+            '<span class="live-link-sub">' + escapeHtml(t.liveLinkHint) + '</span>' +
+          '</span>' +
+          '<span class="live-link-action">' + escapeHtml(t.openLive) + '</span>' +
+        '</span>' +
+      '</a>';
     }
 
     function renderWebcast() {
       const grid = document.getElementById("webcastGrid");
-      const regionSwitch = document.getElementById("regionSwitch");
-      const viewToggle = document.getElementById("viewToggle");
+      const pickerToggle = document.getElementById("pickerToggle");
+      const picker = document.getElementById("livePicker");
+      const pickerTitle = document.getElementById("pickerTitle");
+      const pickerClose = document.getElementById("pickerClose");
+      const pickerGrid = document.getElementById("pickerGrid");
+      const liveControlNote = document.getElementById("liveControlNote");
       const officialLink = document.getElementById("officialLink");
       const liveHeading = document.getElementById("liveHeading");
       const liveEyebrow = document.getElementById("liveEyebrow");
@@ -1812,43 +1994,45 @@
       const t = T();
       if (!grid) return;
 
-      const single = !state.sixMode;
-      const keys = single ? [DEFAULT_CAMERA] : (REGIONS[state.region] || REGIONS.tmk).cameras;
-      grid.className = "webcast-grid " + (single ? "single" : "six");
-      grid.innerHTML = keys.map(webcastTile).join("");
+      const codes = state.liveRegions.slice(0, 6);
+      grid.className = "webcast-grid six";
+      grid.innerHTML = codes.map(liveLinkTile).join("");
 
-      if (regionSwitch) regionSwitch.hidden = single;
-      if (viewToggle) {
-        viewToggle.textContent = single ? t.viewSix : t.viewSingle;
-        viewToggle.setAttribute("aria-pressed", state.sixMode ? "true" : "false");
+      if (pickerToggle) {
+        pickerToggle.textContent = t.choose;
+        pickerToggle.setAttribute("aria-label", t.chooseAria);
+        pickerToggle.setAttribute("aria-expanded", state.pickerOpen ? "true" : "false");
       }
+      if (picker) picker.hidden = !state.pickerOpen;
+      if (pickerTitle) pickerTitle.textContent = t.pickerTitle;
+      if (pickerClose) pickerClose.setAttribute("aria-label", t.pickerClose);
+      if (liveControlNote) liveControlNote.textContent = t.liveControlNote;
       if (liveHeading) liveHeading.textContent = t.liveTitle;
       if (liveEyebrow) liveEyebrow.textContent = t.liveEyebrow;
       if (liveNote) liveNote.textContent = t.liveNote;
       if (liveHideBtn) liveHideBtn.textContent = t.liveHide;
       if (liveRestore) liveRestore.textContent = t.liveShow;
       if (officialLink) {
-        const langPath = currentLang === "zh-Hans" ? "sc" : currentLang === "zh-Hant" ? "tc" : "en";
-        officialLink.href = HKE_WEBCAST_BASE + "/" + langPath + "/traffic-information/live/webcast";
+        officialLink.href = officialWebcastUrl();
         officialLink.textContent = t.officialWebcast;
       }
 
-      document.querySelectorAll("#regionSwitch .region-btn").forEach(function (button) {
-        const code = button.getAttribute("data-region");
-        const region = REGIONS[code];
-        if (region) button.textContent = t[region.labelKey] || code;
-        button.setAttribute("aria-pressed", code === state.region ? "true" : "false");
-      });
+      if (pickerGrid) {
+        pickerGrid.innerHTML = codes.map(function (code, index) {
+          const options = REGION_ORDER.map(function (regionCode) {
+            const region = REGIONS[regionCode];
+            const selected = regionCode === code ? " selected" : "";
+            return '<option value="' + regionCode + '"' + selected + '>' + escapeHtml(t[region.labelKey] || regionCode) + '</option>';
+          }).join("");
+          const label = t.screen.replace("{n}", String(index + 1));
+          return '<label class="picker-row">' +
+            '<span>' + escapeHtml(label) + '</span>' +
+            '<select data-screen="' + index + '" aria-label="' + escapeHtml(t.regionSelectAria.replace("{n}", String(index + 1))) + '">' + options + '</select>' +
+          '</label>';
+        }).join("");
+      }
 
       updateSectionVisibility();
-      refreshWebcastImages();
-    }
-
-    function refreshWebcastImages() {
-      const stamp = Date.now();
-      document.querySelectorAll('#webcastGrid img[data-camera]').forEach(function (img) {
-        img.src = TD_IMAGE_BASE + "/" + img.getAttribute("data-camera") + ".JPG?t=" + stamp;
-      });
     }
 
     function minutesUntil(iso) {
@@ -2072,22 +2256,43 @@
         renderTrafficTicker();
       });
 
-      document.getElementById("viewToggle").addEventListener("click", function () {
-        state.sixMode = !state.sixMode;
-        renderWebcast();
-      });
+      const pickerToggle = document.getElementById("pickerToggle");
+      if (pickerToggle) {
+        pickerToggle.addEventListener("click", function () {
+          state.pickerOpen = !state.pickerOpen;
+          renderWebcast();
+        });
+      }
 
-      document.getElementById("regionSwitch").addEventListener("click", function (event) {
-        const button = event.target.closest("[data-region]");
-        if (!button) return;
-        const code = button.getAttribute("data-region");
-        if (!REGIONS[code]) return;
-        state.region = code;
-        renderWebcast();
-      });
+      const pickerClose = document.getElementById("pickerClose");
+      if (pickerClose) {
+        pickerClose.addEventListener("click", function () {
+          state.pickerOpen = false;
+          renderWebcast();
+        });
+      }
+
+      const pickerGrid = document.getElementById("pickerGrid");
+      if (pickerGrid) {
+        pickerGrid.addEventListener("change", function (event) {
+          const select = event.target.closest("select[data-screen]");
+          if (!select) return;
+          const index = Number(select.getAttribute("data-screen"));
+          const code = select.value;
+          if (!REGIONS[code] || !Number.isInteger(index) || index < 0 || index > 5) return;
+          const next = state.liveRegions.slice();
+          next[index] = code;
+          state.liveRegions = next;
+          try {
+            localStorage.setItem("b3a-live-regions", JSON.stringify(next));
+          } catch (error) {}
+          renderWebcast();
+        });
+      }
     }
 
     function init() {
+      state.liveRegions = loadLiveRegions();
       applyLanguage(currentLang);
       initEvents();
 
@@ -2113,11 +2318,6 @@
         const section = document.getElementById("trafficSection");
         if (!document.hidden && section && !section.hidden) refreshTrafficImages();
       }, REFRESH_TRAFFIC_MS);
-
-      setInterval(function () {
-        const section = document.getElementById("liveSection");
-        if (!document.hidden && section && !section.hidden) refreshWebcastImages();
-      }, REFRESH_WEBCAST_MS);
     }
 
     init();
