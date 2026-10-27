@@ -150,6 +150,14 @@
       flex: none;
     }
 
+    .weather-icon {
+      display: block;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      object-fit: contain;
+    }
+
     .weather-map { border-style: dashed; background: rgba(226, 98, 15, 0.045); }
     .weather-map:hover { border-color: var(--line-strong); background: rgba(226, 98, 15, 0.08); }
 
@@ -766,6 +774,7 @@
         weatherMap: "CMA weather map",
         weatherMapSub: "Radar · satellite · temperature",
         weatherCityHK: "Hong Kong",
+        weatherCityTM: "Tuen Mun",
         weatherCitySZ: "Shenzhen · near Shenzhen Bay",
         weatherHumidity: "Humidity",
         weatherFeels: "Feels like",
@@ -801,7 +810,7 @@
         regionTMK: "Tuen Mun (Ting Kau–Tai Lam Kok)",
         liveDefault: "Tuen Mun Road – Tai Lam Kok [TR114F]",
         sourceBus: "Bus ETA: Citybus open data via DATA.GOV.HK · Stop 003261.",
-        sourceOther: "Weather: CMA · FX: open.er-api.com · Traffic: TD / HKeMobility.",
+        sourceOther: "Weather: Hong Kong Observatory · Map: CMA · FX: open.er-api.com · Traffic: TD / HKeMobility.",
         distanceNote: "Distance to stop is approximated from the ETA at 25 km/h."
       },
       "zh-Hans": {
@@ -836,6 +845,7 @@
         weatherMap: "CMA 天气图",
         weatherMapSub: "雷达 · 卫星 · 气温",
         weatherCityHK: "香港",
+        weatherCityTM: "屯门",
         weatherCitySZ: "深圳 · 深圳湾附近",
         weatherHumidity: "湿度",
         weatherFeels: "体感",
@@ -871,7 +881,7 @@
         regionTMK: "屯门（汀九－大榄角）",
         liveDefault: "屯门公路－大榄角段 [TR114F]",
         sourceBus: "巴士到站：城巴开放数据（DATA.GOV.HK）· 站点 003261。",
-        sourceOther: "天气：中国气象局 CMA · 汇率：open.er-api.com · 交通：运输署 / 香港出行易。",
+        sourceOther: "天气：香港天文台 · 天气图：CMA · 汇率：open.er-api.com · 交通：运输署 / 香港出行易。",
         distanceNote: "距站距离按 25 公里/小时由预计到站时间推算，仅供参考。"
       },
       "zh-Hant": {
@@ -906,6 +916,7 @@
         weatherMap: "CMA 天氣圖",
         weatherMapSub: "雷達 · 衛星 · 氣溫",
         weatherCityHK: "香港",
+        weatherCityTM: "屯門",
         weatherCitySZ: "深圳 · 深圳灣附近",
         weatherHumidity: "濕度",
         weatherFeels: "體感",
@@ -941,7 +952,7 @@
         regionTMK: "屯門（汀九－大欖角）",
         liveDefault: "屯門公路－大欖角段 [TR114F]",
         sourceBus: "巴士到站：城巴開放數據（DATA.GOV.HK）· 站點 003261。",
-        sourceOther: "天氣：中國氣象局 CMA · 匯率：open.er-api.com · 交通：運輸署 / 香港出行易。",
+        sourceOther: "天氣：香港天文台 · 天氣圖：CMA · 匯率：open.er-api.com · 交通：運輸署 / 香港出行易。",
         distanceNote: "距站距離按 25 公里/小時由預計到站時間推算，僅供參考。"
       }
     };
@@ -984,10 +995,11 @@
     };
 
     const BUS_API_URL = "https://rt.data.gov.hk/v2/transport/citybus/eta/CTB/003261/B3A";
+    const HKO_API_BASE = "https://data.weather.gov.hk/weatherAPI/opendata/weather.php";
+    const CMA_MAP_URL = "https://weather.cma.cn/web/weather/map.html";
     const CMA_NOW_URL = "https://weather.cma.cn/api/now/59493";
     const CMA_SZ_FORECAST_URL = "https://weather.cma.cn/api/weather/59493";
     const CMA_HK_FORECAST_URL = "https://weather.cma.cn/api/weather/45005";
-    const CMA_MAP_URL = "https://weather.cma.cn/web/weather/map.html";
     const FX_API_URL = "https://open.er-api.com/v6/latest/USD";
     const TD_IMAGE_BASE = "https://tdcctv.data.one.gov.hk";
     const HKE_WEBCAST_BASE = "https://www.hkemobility.gov.hk";
@@ -1003,7 +1015,7 @@
       busUpdated: null,
       busError: false,
       busLoading: true,
-      weather: { now: null, sz: null, hk: null, error: false, loading: true },
+      weather: { rhr: null, flw: null, fnd: null, lang: null, error: false, loading: true },
       fx: { usdCny: null, usdHkd: null, cnyHkd: null, updated: null, error: false, loading: true },
       trafficExpanded: false,
       snapshotUserHidden: false,
@@ -1174,63 +1186,102 @@
       });
     }
 
+    function hkoLang() {
+      return currentLang === "zh-Hans" ? "sc" : currentLang === "zh-Hant" ? "tc" : "en";
+    }
+
+    function hkoIconHtml(code) {
+      const number = Number(code);
+      if (!Number.isFinite(number)) return '<span class="weather-emoji">🌤️</span>';
+      return '<img class="weather-icon" src="https://www.hko.gov.hk/images/wxicon/pic' + number + '.png" alt="" loading="lazy">';
+    }
+
+    function findTemperature(places, names) {
+      if (!Array.isArray(places)) return null;
+      const found = places.find(function (item) {
+        return item && item.place && names.some(function (name) { return String(item.place).indexOf(name) !== -1; });
+      });
+      return found ? Number(found.value) : null;
+    }
+
+    function temperatureText(value) {
+      if (value == null || value === "") return "—";
+      return Number.isFinite(Number(value)) ? String(Math.round(Number(value))) : "—";
+    }
+
+    function formatHkoTime(value) {
+      const date = new Date(value);
+      if (!Number.isNaN(date.getTime())) return hkTime(date);
+      const text = String(value || "");
+      const match = text.match(/\d{2}:\d{2}/);
+      return match ? match[0] : "—";
+    }
+
+    function tomorrowForecast(fnd) {
+      const list = fnd && Array.isArray(fnd.weatherForecast) ? fnd.weatherForecast : [];
+      if (!list.length) return null;
+      let today = "";
+      try {
+        today = new Intl.DateTimeFormat("en-CA", {
+          timeZone: "Asia/Hong_Kong",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit"
+        }).format(new Date()).replace(/-/g, "");
+      } catch (error) {
+        today = "";
+      }
+      return list.find(function (item) { return String(item.forecastDate) !== today; }) || list[0];
+    }
+
     function renderWeatherTicker() {
       const group = document.getElementById("weatherGroup");
       const track = document.getElementById("weatherTrack");
       if (!group || !track) return;
 
-      if (state.weather.loading && !state.weather.now && !state.weather.hk) {
+      if (state.weather.loading && !state.weather.rhr && !state.weather.fnd) {
         group.innerHTML = tickerLoadingCard(T().weatherLoading);
         setupTicker(track, group, "left", 48);
         return;
       }
 
-      if (state.weather.error && !state.weather.now && !state.weather.hk) {
+      if (state.weather.error && !state.weather.rhr && !state.weather.fnd) {
         group.innerHTML = '<span class="ticker-card ticker-loading">' + escapeHtml(T().weatherUnavailable) + '</span>';
         setupTicker(track, group, "left", 48);
         return;
       }
 
-      const nowData = state.weather.now;
-      const szData = state.weather.sz;
-      const hkData = state.weather.hk;
-      const now = nowData && nowData.now ? nowData.now : null;
-      const szDaily = szData && szData.daily ? szData.daily[0] : null;
-      const hkDaily = hkData && hkData.daily ? hkData.daily : [];
-      const today = hkDaily[0] || szDaily || null;
-      const tomorrow = hkDaily[1] || null;
-      const temp = now && Number(now.temperature) !== 9999 ? Number(now.temperature).toFixed(1) : "—";
-      const feels = now && Number(now.feelst) !== 9999 ? Number(now.feelst).toFixed(1) : "—";
-      const humidity = now && Number(now.humidity) !== 9999 ? Number(now.humidity).toFixed(0) : "—";
-      const currentCode = szDaily ? szDaily.dayCode : (today ? today.dayCode : null);
-      const currentText = szDaily ? (szDaily.dayText || "") : (today ? (today.dayText || "") : "");
-      const currentDesc = getWeatherCode(currentCode, currentText);
-      const updated = formatCmaTime((nowData && nowData.lastUpdate) || (szData && szData.lastUpdate) || "");
-
-      const todayHigh = today ? today.high : "—";
-      const todayLow = today ? today.low : "—";
-      const todayDay = today ? getWeatherCode(today.dayCode, today.dayText) : "—";
-      const todayNight = today ? getWeatherCode(today.nightCode, today.nightText) : "—";
-      const tomorrowHigh = tomorrow ? tomorrow.high : "—";
-      const tomorrowLow = tomorrow ? tomorrow.low : "—";
-      const tomorrowDay = tomorrow ? getWeatherCode(tomorrow.dayCode, tomorrow.dayText) : "—";
-      const tomorrowNight = tomorrow ? getWeatherCode(tomorrow.nightCode, tomorrow.nightText) : "—";
+      const rhr = state.weather.rhr || {};
+      const flw = state.weather.flw || {};
+      const fnd = state.weather.fnd || {};
+      const places = rhr.temperature && Array.isArray(rhr.temperature.data) ? rhr.temperature.data : [];
+      const hkoTemp = findTemperature(places, ["Hong Kong Observatory", "香港天文台"]);
+      const tmTemp = findTemperature(places, ["Tuen Mun", "屯門", "屯门"]);
+      const humidityValue = rhr.humidity && rhr.humidity.data && rhr.humidity.data[0] ? rhr.humidity.data[0].value : null;
+      const iconCode = rhr.icon && rhr.icon.length ? rhr.icon[0] : 51;
+      const updated = formatHkoTime(rhr.updateTime || flw.updateTime || "");
+      const forecastText = flw.forecastDesc || flw.generalSituation || "—";
+      const tomorrow = tomorrowForecast(fnd);
+      const tomorrowHigh = tomorrow && tomorrow.forecastMaxtemp ? temperatureText(tomorrow.forecastMaxtemp.value) : "—";
+      const tomorrowLow = tomorrow && tomorrow.forecastMintemp ? temperatureText(tomorrow.forecastMintemp.value) : "—";
+      const tomorrowWeather = tomorrow ? (tomorrow.forecastWeather || "—") : "—";
+      const warning = rhr.warningMessage ? trimText(rhr.warningMessage, 80) : "";
 
       const cards = [
         '<div class="ticker-card weather-card">' +
-          '<span class="weather-emoji">' + getWeatherIcon(currentCode) + '</span>' +
-          '<span class="ticker-copy"><strong>' + escapeHtml(T().weatherCitySZ) + ' · ' + escapeHtml(temp) + '°C</strong>' +
-          '<small>' + escapeHtml(T().weatherNow) + ' ' + escapeHtml(currentDesc) + ' · ' + escapeHtml(T().weatherHumidity) + ' ' + escapeHtml(humidity) + '% · ' + escapeHtml(T().weatherFeels) + ' ' + escapeHtml(feels) + '°C · ' + escapeHtml(T().weatherUpdated) + ' ' + escapeHtml(updated) + '</small></span>' +
+          hkoIconHtml(iconCode) +
+          '<span class="ticker-copy"><strong>' + escapeHtml(T().weatherCityHK) + ' ' + escapeHtml(temperatureText(hkoTemp)) + '°C</strong>' +
+          '<small>' + escapeHtml(T().weatherCityTM) + ' ' + escapeHtml(temperatureText(tmTemp)) + '°C · ' + escapeHtml(T().weatherHumidity) + ' ' + escapeHtml(humidityValue == null ? "—" : Math.round(Number(humidityValue))) + '% · ' + escapeHtml(T().weatherUpdated) + ' ' + escapeHtml(updated) + (warning ? ' · ' + escapeHtml(warning) : '') + '</small></span>' +
         '</div>',
         '<div class="ticker-card weather-card">' +
-          '<span class="weather-emoji">' + getWeatherIcon(today ? today.dayCode : null) + '</span>' +
-          '<span class="ticker-copy"><strong>' + escapeHtml(T().weatherToday) + ' · ' + escapeHtml(T().weatherCityHK) + ' ' + escapeHtml(todayHigh) + '° / ' + escapeHtml(todayLow) + '°</strong>' +
-          '<small>' + escapeHtml(T().weatherDay) + ' ' + escapeHtml(todayDay) + ' · ' + escapeHtml(T().weatherNight) + ' ' + escapeHtml(todayNight) + '</small></span>' +
+          hkoIconHtml(iconCode) +
+          '<span class="ticker-copy"><strong>' + escapeHtml(T().weatherToday) + ' · ' + escapeHtml(T().weatherCityHK) + '</strong>' +
+          '<small>' + escapeHtml(trimText(forecastText, 118)) + '</small></span>' +
         '</div>',
         '<div class="ticker-card weather-card">' +
-          '<span class="weather-emoji">' + getWeatherIcon(tomorrow ? tomorrow.dayCode : null) + '</span>' +
+          hkoIconHtml(tomorrow ? tomorrow.ForecastIcon : iconCode) +
           '<span class="ticker-copy"><strong>' + escapeHtml(T().weatherTomorrow) + ' · ' + escapeHtml(T().weatherCityHK) + ' ' + escapeHtml(tomorrowHigh) + '° / ' + escapeHtml(tomorrowLow) + '°</strong>' +
-          '<small>' + escapeHtml(T().weatherDay) + ' ' + escapeHtml(tomorrowDay) + ' · ' + escapeHtml(T().weatherNight) + ' ' + escapeHtml(tomorrowNight) + '</small></span>' +
+          '<small>' + escapeHtml(trimText(tomorrowWeather, 118)) + '</small></span>' +
         '</div>',
         '<a class="ticker-card weather-map" href="' + CMA_MAP_URL + '" target="_blank" rel="noopener">' +
           '<span class="weather-emoji">🗺️</span>' +
@@ -1243,25 +1294,30 @@
     }
 
     let weatherTimer = null;
+    let weatherRequestId = 0;
 
     async function fetchWeather() {
-      if (!state.weather.now && !state.weather.hk) {
+      const requestId = ++weatherRequestId;
+      const lang = hkoLang();
+      if (!state.weather.rhr && !state.weather.fnd) {
         state.weather.loading = true;
         renderWeatherTicker();
       }
       const results = await Promise.allSettled([
-        fetchJson(CMA_NOW_URL),
-        fetchJson(CMA_SZ_FORECAST_URL),
-        fetchJson(CMA_HK_FORECAST_URL)
+        fetchJson(HKO_API_BASE + "?dataType=rhrread&lang=" + lang),
+        fetchJson(HKO_API_BASE + "?dataType=flw&lang=" + lang),
+        fetchJson(HKO_API_BASE + "?dataType=fnd&lang=" + lang)
       ]);
-      const now = results[0].status === "fulfilled" ? results[0].value : null;
-      const sz = results[1].status === "fulfilled" ? results[1].value : null;
-      const hk = results[2].status === "fulfilled" ? results[2].value : null;
-      if ((now && now.data) || (sz && sz.data) || (hk && hk.data)) {
+      if (requestId !== weatherRequestId) return;
+      const rhr = results[0].status === "fulfilled" ? results[0].value : null;
+      const flw = results[1].status === "fulfilled" ? results[1].value : null;
+      const fnd = results[2].status === "fulfilled" ? results[2].value : null;
+      if (rhr || flw || fnd) {
         state.weather = {
-          now: now && now.data ? now.data : state.weather.now,
-          sz: sz && sz.data ? sz.data : state.weather.sz,
-          hk: hk && hk.data ? hk.data : state.weather.hk,
+          rhr: rhr || state.weather.rhr,
+          flw: flw || state.weather.flw,
+          fnd: fnd || state.weather.fnd,
+          lang: lang,
           error: false,
           loading: false
         };
@@ -1622,6 +1678,7 @@
       document.querySelectorAll(".lang-btn").forEach(function (button) {
         button.addEventListener("click", function () {
           applyLanguage(button.getAttribute("data-lang"));
+          if (state.weather.lang !== hkoLang()) fetchWeather();
         });
       });
 
