@@ -938,6 +938,74 @@
 
     .picker-row select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
+    .single-live-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 0 12px 10px;
+    }
+
+    .single-live-open { text-decoration: none; }
+    .single-live-share { border-color: var(--green); background: var(--green); }
+
+    .single-live-frame {
+      position: relative;
+      margin: 0 12px;
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #1c1611;
+    }
+
+    .single-live-frame video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #0d0b09;
+      object-fit: contain;
+    }
+
+    .single-live-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 18px;
+      text-align: center;
+      color: #fff4e4;
+      background:
+        radial-gradient(120% 100% at 50% 0%, rgba(226, 98, 15, 0.22), transparent 60%),
+        #1c1611;
+    }
+
+    .single-live-placeholder strong { font-size: 13px; line-height: 1.35; }
+
+    .single-live-placeholder span:last-child {
+      max-width: 520px;
+      color: rgba(255, 244, 228, 0.7);
+      font-size: 10px;
+      line-height: 1.55;
+    }
+
+    .single-live-icon {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(255, 244, 228, 0.3);
+      border-radius: 50%;
+      background: rgba(226, 98, 15, 0.18);
+      color: #ffd9b8;
+      font-size: 13px;
+    }
+
+    .single-live-panel .section-note { padding-top: 8px; }
+
     .source {
       margin: 18px 2px 0;
       color: #a87a5b;
@@ -978,6 +1046,11 @@
       .live-link-body { gap: 7px; padding: 8px; }
       .live-link-title { font-size: 11.5px; }
       .live-link-sub { font-size: 7.5px; }
+      .single-live-actions { padding-left: 9px; padding-right: 9px; }
+      .single-live-frame { margin-left: 9px; margin-right: 9px; }
+      .single-live-placeholder { padding: 12px; }
+      .single-live-placeholder strong { font-size: 11px; }
+      .single-live-placeholder span:last-child { font-size: 9px; }
       .section-note { padding-left: 12px; padding-right: 12px; }
       .snapshot-card { width: 180px; }
       .snapshot-toggle { width: 84px; }
@@ -1127,6 +1200,31 @@
     </section>
     <button class="restore-bar" id="liveRestore" type="button" hidden>Show live traffic</button>
 
+    <section class="info-panel single-live-panel" id="singleLiveSection" aria-labelledby="singleLiveHeading">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow" id="singleLiveEyebrow">Live traffic</p>
+          <h2 id="singleLiveHeading">Single live view</h2>
+        </div>
+        <button class="section-action" id="singleLiveHideBtn" type="button">Hide</button>
+      </div>
+      <div class="single-live-actions">
+        <a class="view-toggle single-live-open" id="singleLiveOpen" href="https://www.hkemobility.gov.hk/en/traffic-information/live/webcast" target="_blank" rel="noopener">Open official live ↗</a>
+        <button class="view-toggle single-live-share" id="singleLiveShare" type="button">Share this tab</button>
+        <button class="section-action" id="singleLiveStop" type="button" hidden>Stop sharing</button>
+      </div>
+      <div class="single-live-frame" id="singleLiveFrame">
+        <video id="singleLiveVideo" autoplay muted playsinline hidden></video>
+        <div class="single-live-placeholder" id="singleLivePlaceholder">
+          <span class="single-live-icon" aria-hidden="true">▶</span>
+          <strong id="singleLivePlaceholderTitle">Open the official live page, then share that tab.</strong>
+          <span id="singleLivePlaceholderText">Choose one of the five regions on the official page; this frame mirrors it live.</span>
+        </div>
+      </div>
+      <p class="section-note" id="singleLiveNote">Browser tab sharing only. Use desktop Chrome or Edge, and re-share after refreshing.</p>
+    </section>
+    <button class="restore-bar" id="singleLiveRestore" type="button" hidden>Show single live view</button>
+
     <p class="source">
       <span id="sourceLine">Bus ETA: Citybus open data via DATA.GOV.HK · Stop 003261.</span><br>
       <span id="sourceLine2">Weather: Hong Kong Observatory · Map: CMA · FX: open.er-api.com · Traffic: TD / HKeMobility.</span><br>
@@ -1208,6 +1306,18 @@
         liveNote: "Official live links only. Each screen opens the HKeMobility webcast in a new tab; nothing refreshes automatically.",
         liveHide: "Hide",
         liveShow: "Show live traffic",
+        singleLiveEyebrow: "Live traffic",
+        singleLiveTitle: "Single live view",
+        singleLiveHide: "Hide",
+        singleLiveShow: "Show single live view",
+        singleLiveOpen: "Open official live ↗",
+        singleLiveShare: "Share this tab",
+        singleLiveReshare: "Share another tab",
+        singleLiveStop: "Stop sharing",
+        singleLivePlaceholderTitle: "Open the official live page, then share that tab.",
+        singleLivePlaceholderText: "Choose one of the five regions on the official page; this frame mirrors it live.",
+        singleLiveNote: "Browser tab sharing only. Use desktop Chrome or Edge, and re-share after refreshing.",
+        singleLiveUnsupported: "This browser does not support tab sharing.",
         liveControlNote: "Official HKeMobility live webcast links",
         choose: "Choose",
         chooseAria: "Choose a region for each live screen",
@@ -1298,6 +1408,18 @@
         liveNote: "仅提供官方直播链接。每个画面会在新标签页打开「香港出行易」官方直播，不会自动刷新画面。",
         liveHide: "隐藏",
         liveShow: "显示交通直播",
+        singleLiveEyebrow: "交通直播",
+        singleLiveTitle: "单画面直播",
+        singleLiveHide: "隐藏",
+        singleLiveShow: "显示单画面直播",
+        singleLiveOpen: "打开官方直播 ↗",
+        singleLiveShare: "共享此标签页",
+        singleLiveReshare: "重新选择标签页",
+        singleLiveStop: "停止共享",
+        singleLivePlaceholderTitle: "先打开官方直播页，然后共享那个标签页。",
+        singleLivePlaceholderText: "在官方页面选择五个区域中的任意一个，这个方框会实时显示该标签页画面。",
+        singleLiveNote: "这是浏览器标签页共享，不是直接嵌入。建议使用桌面版 Chrome / Edge；刷新页面后需要重新共享。",
+        singleLiveUnsupported: "当前浏览器不支持标签页共享。",
         liveControlNote: "香港出行易官方直播链接",
         choose: "选择",
         chooseAria: "为六个直播画面选择区域",
@@ -1388,6 +1510,18 @@
         liveNote: "僅提供官方直播連結。每個畫面會在新分頁開啟「香港出行易」官方直播，不會自動刷新畫面。",
         liveHide: "隱藏",
         liveShow: "顯示交通直播",
+        singleLiveEyebrow: "交通直播",
+        singleLiveTitle: "單畫面直播",
+        singleLiveHide: "隱藏",
+        singleLiveShow: "顯示單畫面直播",
+        singleLiveOpen: "開啟官方直播 ↗",
+        singleLiveShare: "共享此分頁",
+        singleLiveReshare: "重新選擇分頁",
+        singleLiveStop: "停止共享",
+        singleLivePlaceholderTitle: "先開啟官方直播頁，然後共享該分頁。",
+        singleLivePlaceholderText: "在官方頁面選擇五個區域中的任意一個，這個方框會實時顯示該分頁畫面。",
+        singleLiveNote: "這是瀏覽器分頁共享，不是直接嵌入。建議使用桌面版 Chrome / Edge；重新整理頁面後需要再次共享。",
+        singleLiveUnsupported: "目前瀏覽器不支援分頁共享。",
         liveControlNote: "香港出行易官方直播連結",
         choose: "選擇",
         chooseAria: "為六個直播畫面選擇區域",
@@ -1477,6 +1611,7 @@
       trafficExpanded: false,
       snapshotUserHidden: false,
       liveUserHidden: false,
+      singleLiveUserHidden: false,
       liveRegions: DEFAULT_LIVE_REGIONS.slice(),
       pickerOpen: false
     };
@@ -1950,10 +2085,14 @@
       const trafficRestore = document.getElementById("trafficRestore");
       const liveSection = document.getElementById("liveSection");
       const liveRestore = document.getElementById("liveRestore");
+      const singleLiveSection = document.getElementById("singleLiveSection");
+      const singleLiveRestore = document.getElementById("singleLiveRestore");
       if (trafficSection) trafficSection.hidden = state.snapshotUserHidden;
       if (trafficRestore) trafficRestore.hidden = !state.snapshotUserHidden;
       if (liveSection) liveSection.hidden = state.liveUserHidden;
       if (liveRestore) liveRestore.hidden = !state.liveUserHidden;
+      if (singleLiveSection) singleLiveSection.hidden = state.singleLiveUserHidden;
+      if (singleLiveRestore) singleLiveRestore.hidden = !state.singleLiveUserHidden;
     }
 
     function liveLinkTile(code, index) {
@@ -2031,6 +2170,100 @@
           '</label>';
         }).join("");
       }
+
+      updateSectionVisibility();
+    }
+
+    let singleLiveStream = null;
+
+    function singleLiveSupported() {
+      return !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia);
+    }
+
+    function stopSingleLive() {
+      if (singleLiveStream) {
+        singleLiveStream.getTracks().forEach(function (track) { track.stop(); });
+        singleLiveStream = null;
+      }
+      const video = document.getElementById("singleLiveVideo");
+      if (video) {
+        video.pause();
+        video.srcObject = null;
+      }
+      renderSingleLive();
+    }
+
+    async function shareSingleLive() {
+      if (!singleLiveSupported()) {
+        renderSingleLive();
+        return;
+      }
+      const shareBtn = document.getElementById("singleLiveShare");
+      if (shareBtn) shareBtn.disabled = true;
+      try {
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+          video: true,
+          audio: false,
+          selfBrowserSurface: "exclude"
+        });
+        if (singleLiveStream) {
+          singleLiveStream.getTracks().forEach(function (track) { track.stop(); });
+        }
+        singleLiveStream = stream;
+        const video = document.getElementById("singleLiveVideo");
+        if (video) {
+          video.srcObject = stream;
+          video.hidden = false;
+          const playPromise = video.play();
+          if (playPromise && playPromise.catch) playPromise.catch(function () {});
+        }
+        const track = stream.getVideoTracks()[0];
+        if (track) {
+          track.addEventListener("ended", function () {
+            stopSingleLive();
+          }, { once: true });
+        }
+        renderSingleLive();
+      } catch (error) {
+        renderSingleLive();
+      }
+    }
+
+    function renderSingleLive() {
+      const t = T();
+      const eyebrow = document.getElementById("singleLiveEyebrow");
+      const heading = document.getElementById("singleLiveHeading");
+      const hideBtn = document.getElementById("singleLiveHideBtn");
+      const restore = document.getElementById("singleLiveRestore");
+      const open = document.getElementById("singleLiveOpen");
+      const share = document.getElementById("singleLiveShare");
+      const stop = document.getElementById("singleLiveStop");
+      const note = document.getElementById("singleLiveNote");
+      const video = document.getElementById("singleLiveVideo");
+      const placeholder = document.getElementById("singleLivePlaceholder");
+      const placeholderTitle = document.getElementById("singleLivePlaceholderTitle");
+      const placeholderText = document.getElementById("singleLivePlaceholderText");
+      const supported = singleLiveSupported();
+      const sharing = !!singleLiveStream;
+
+      if (eyebrow) eyebrow.textContent = t.singleLiveEyebrow;
+      if (heading) heading.textContent = t.singleLiveTitle;
+      if (hideBtn) hideBtn.textContent = t.singleLiveHide;
+      if (restore) restore.textContent = t.singleLiveShow;
+      if (open) {
+        open.href = officialWebcastUrl();
+        open.textContent = t.singleLiveOpen;
+      }
+      if (share) {
+        share.textContent = sharing ? t.singleLiveReshare : t.singleLiveShare;
+        share.disabled = !supported;
+      }
+      if (stop) stop.hidden = !sharing;
+      if (note) note.textContent = t.singleLiveNote;
+      if (video) video.hidden = !sharing;
+      if (placeholder) placeholder.hidden = sharing;
+      if (placeholderTitle) placeholderTitle.textContent = supported ? t.singleLivePlaceholderTitle : t.singleLiveUnsupported;
+      if (placeholderText) placeholderText.textContent = supported ? t.singleLivePlaceholderText : t.singleLiveNote;
 
       updateSectionVisibility();
     }
@@ -2218,6 +2451,7 @@
       renderFxTicker();
       renderTrafficTicker();
       renderWebcast();
+      renderSingleLive();
       renderBus();
       updateSectionVisibility();
     }
@@ -2248,6 +2482,16 @@
         state.liveUserHidden = false;
         updateSectionVisibility();
       });
+      document.getElementById("singleLiveHideBtn").addEventListener("click", function () {
+        state.singleLiveUserHidden = true;
+        updateSectionVisibility();
+      });
+      document.getElementById("singleLiveRestore").addEventListener("click", function () {
+        state.singleLiveUserHidden = false;
+        updateSectionVisibility();
+      });
+      document.getElementById("singleLiveShare").addEventListener("click", shareSingleLive);
+      document.getElementById("singleLiveStop").addEventListener("click", stopSingleLive);
 
       document.getElementById("trafficSection").addEventListener("click", function (event) {
         const toggle = event.target.closest('[data-action="toggle-traffic"]');
