@@ -2951,10 +2951,12 @@
           .replace("{route}", state.route)
           .replace("{stop}", stopId);
       }
-      document.title = (t.titleTemplate || "{route} · {from} → {to}")
-        .replace("{route}", state.route)
-        .replace("{from}", from || fallbackLabel)
-        .replace("{to}", to || "");
+      document.title = from && to
+        ? (t.titleTemplate || "{route} · {from} → {to}")
+            .replace("{route}", state.route)
+            .replace("{from}", from)
+            .replace("{to}", to)
+        : state.route + " · " + fallbackLabel;
       const source = document.getElementById("sourceLine");
       if (source) {
         source.innerHTML = escapeHtml((t.sourceBus || "")
