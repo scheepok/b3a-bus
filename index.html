@@ -1006,6 +1006,205 @@
 
     .single-live-panel .section-note { padding-top: 8px; }
 
+    .journey-panel {
+      margin-bottom: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--card);
+      box-shadow: 0 16px 40px rgba(122, 66, 20, 0.1);
+      backdrop-filter: blur(18px);
+    }
+
+    .journey-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 9px;
+    }
+
+    .journey-head .eyebrow { margin: 0; }
+    .journey-status { color: var(--muted); font-size: 9.5px; font-weight: 700; white-space: nowrap; }
+    .journey-status.error { color: var(--red); }
+
+    .route-field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: rgba(255, 252, 244, 0.86);
+      color: var(--text);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .route-field:hover,
+    .route-field[aria-expanded="true"] { border-color: var(--accent); }
+
+    .route-field-badge {
+      flex: none;
+      display: grid;
+      place-items: center;
+      min-width: 46px;
+      height: 32px;
+      padding: 0 8px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: -0.3px;
+    }
+
+    .route-field-copy {
+      display: flex;
+      flex: 1;
+      min-width: 0;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .route-field-copy strong,
+    .route-field-copy small {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .route-field-copy strong { font-size: 12.5px; font-weight: 750; }
+    .route-field-copy small { color: var(--muted); font-size: 9.5px; }
+    .route-field-arrow { flex: none; color: var(--muted); font-size: 13px; }
+
+    .route-picker {
+      margin-top: 9px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 250, 240, 0.72);
+    }
+
+    .route-search {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: #fffdf7;
+      color: var(--text);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .route-search:focus-visible,
+    .journey-field select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+    .route-list {
+      display: grid;
+      gap: 4px;
+      max-height: 236px;
+      margin-top: 8px;
+      padding-right: 2px;
+      overflow-y: auto;
+    }
+
+    .route-option {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      width: 100%;
+      padding: 7px 8px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .route-option:hover,
+    .route-option:focus-visible {
+      border-color: rgba(226, 98, 15, 0.22);
+      background: rgba(226, 98, 15, 0.08);
+      outline: none;
+    }
+
+    .route-option[aria-selected="true"] {
+      border-color: rgba(226, 98, 15, 0.55);
+      background: rgba(226, 98, 15, 0.13);
+    }
+
+    .route-option-code {
+      flex: none;
+      min-width: 44px;
+      padding: 4px 7px;
+      border-radius: 7px;
+      background: rgba(226, 98, 15, 0.13);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .route-option-copy { display: flex; min-width: 0; flex-direction: column; gap: 1px; }
+
+    .route-option-copy strong,
+    .route-option-copy small {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .route-option-copy strong { font-size: 11.5px; font-weight: 750; }
+    .route-option-copy small { color: var(--muted); font-size: 9px; }
+
+    .route-option-empty {
+      padding: 12px;
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .journey-controls {
+      display: grid;
+      grid-template-columns: 0.78fr 1fr 1fr;
+      gap: 8px;
+      margin-top: 9px;
+    }
+
+    .journey-field { display: grid; gap: 4px; min-width: 0; }
+
+    .journey-field span {
+      color: var(--muted);
+      font-size: 8.5px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .journey-field select {
+      width: 100%;
+      min-width: 0;
+      padding: 8px 9px;
+      border: 1px solid var(--line-strong);
+      border-radius: 9px;
+      background: rgba(255, 252, 244, 0.9);
+      color: var(--text);
+      font: inherit;
+      font-size: 10.5px;
+      font-weight: 650;
+    }
+
+    .journey-field select:disabled { color: var(--muted); opacity: 0.7; }
+
+    .journey-note { margin: 8px 2px 0; color: var(--muted); font-size: 9.5px; line-height: 1.45; }
+    .journey-note.error { color: var(--red); }
+
     .source {
       margin: 18px 2px 0;
       color: #a87a5b;
@@ -1024,6 +1223,10 @@
       .route-badge { min-width: 54px; height: 40px; font-size: 20px; letter-spacing: -0.5px; }
       .route-copy h1 { font-size: 14px; }
       .route-copy p { font-size: 11.5px; }
+      .journey-panel { padding: 11px; }
+      .journey-controls { grid-template-columns: 1fr; }
+      .journey-status { display: none; }
+      .route-list { max-height: 200px; }
       .live-pill { padding: 6px 9px; font-size: 9px; }
       .lang-btn { padding: 4px 6px; font-size: 9px; }
       .board-head { padding: 19px 18px 14px; }
@@ -1093,7 +1296,7 @@
     <div class="bus-zone">
       <header class="topbar">
         <div class="route-lockup">
-          <div class="route-badge" aria-hidden="true">B3A</div>
+          <div class="route-badge" id="routeBadge" aria-hidden="true">B3A</div>
           <div class="route-copy">
             <h1 id="routeTitle">Fu Tai Estate → Shenzhen Bay Port</h1>
             <p id="routeMeta">Citybus · Castle Peak Road</p>
@@ -1111,6 +1314,43 @@
           </div>
         </div>
       </header>
+
+      <section class="journey-panel" aria-labelledby="journeyHeading">
+        <div class="journey-head">
+          <p class="eyebrow" id="journeyHeading">Find your bus</p>
+          <span class="journey-status" id="journeyStatus"></span>
+        </div>
+        <button class="route-field" id="routeField" type="button" aria-expanded="false" aria-controls="routePicker">
+          <span class="route-field-badge" id="routeFieldBadge">B3A</span>
+          <span class="route-field-copy">
+            <strong id="routeFieldTitle">Choose a Citybus route</strong>
+            <small id="routeFieldSub">Search all Citybus routes</small>
+          </span>
+          <span class="route-field-arrow" aria-hidden="true">▾</span>
+        </button>
+        <div class="route-picker" id="routePicker" hidden>
+          <input class="route-search" id="routeSearch" type="search" autocomplete="off" spellcheck="false" placeholder="Type a route number or letter…" aria-label="Search Citybus routes">
+          <div class="route-list" id="routeList" role="listbox" aria-label="Citybus routes"></div>
+        </div>
+        <div class="journey-controls">
+          <label class="journey-field">
+            <span id="directionLabel">Direction</span>
+            <select id="directionSelect">
+              <option value="O">Outbound</option>
+              <option value="I">Inbound</option>
+            </select>
+          </label>
+          <label class="journey-field">
+            <span id="startLabel">Boarding stop</span>
+            <select id="startSelect"></select>
+          </label>
+          <label class="journey-field">
+            <span id="endLabel">Alighting stop</span>
+            <select id="endSelect"></select>
+          </label>
+        </div>
+        <p class="journey-note" id="journeyNote"></p>
+      </section>
 
       <section class="board" aria-labelledby="boardTitle">
         <div class="board-head">
@@ -1241,6 +1481,32 @@
         title: "B3A · Fu Tai Estate → Shenzhen Bay Port",
         routeTitle: "Fu Tai Estate → Shenzhen Bay Port",
         routeMeta: "Route B3A · Stop 003261 · Fu Tai Estate, Castle Peak Road",
+        journeyEyebrow: "Find your bus",
+        journeyStatusRoutes: "Loading routes…",
+        journeyStatusRoutesError: "Routes unavailable",
+        journeyStatusStops: "Loading stops…",
+        journeyStatusStopsError: "Stops unavailable",
+        routeFieldTitle: "Choose a Citybus route",
+        routeFieldSub: "Search all Citybus routes",
+        routeSearchPlaceholder: "Type a route number or letter…",
+        routeSearchAria: "Search Citybus routes",
+        routeListAria: "Citybus routes",
+        routeLoading: "Loading Citybus routes…",
+        routeError: "Could not load Citybus routes. Close and try again.",
+        routeEmpty: "No matching routes.",
+        routeNoName: "Route {route}",
+        directionLabel: "Direction",
+        directionOutbound: "Outbound",
+        directionInbound: "Inbound",
+        startLabel: "Boarding stop",
+        endLabel: "Alighting stop",
+        selectStop: "Select a stop",
+        stopFallback: "Stop {id}",
+        stopsLoading: "Loading stops for this route…",
+        stopsError: "Could not load the stops for this route.",
+        journeyHint: "Live ETA follows the selected route, direction and boarding stop.",
+        routeMetaTemplate: "Route {route} · Stop {stop}",
+        titleTemplate: "{route} · {from} → {to}",
         boardEyebrow: "Live departures",
         boardTitleMain: "Next",
         boardTitleSub: "buses",
@@ -1256,7 +1522,7 @@
         loadingTitle: "Loading departures…",
         loadingSub: "Fetching live Citybus data",
         emptyNoTitle: "No upcoming departures",
-        emptyNoText: "No live B3A buses are currently reported. This board checks again automatically.",
+        emptyNoText: "No live {route} buses are currently reported. This board checks again automatically.",
         emptyErrorTitle: "Live data unavailable",
         emptyErrorText: "Please check your connection. This board is retrying automatically.",
         nextDeparture: "Next departure",
@@ -1335,7 +1601,7 @@
         regionTW: "Tsuen Wan",
         regionTM: "Tuen Mun",
         regionTMK: "Tuen Mun (Ting Kau–Tai Lam Kok)",
-        sourceBus: "Bus ETA: Citybus open data via DATA.GOV.HK · Stop 003261.",
+        sourceBus: "Bus ETA: Citybus open data via DATA.GOV.HK · Route {route} · Stop {stop}.",
         sourceOther: "Weather: Hong Kong Observatory · Map: CMA · FX: open.er-api.com · Traffic: TD / HKeMobility.",
         distanceNote: "Distance to stop is approximated from the ETA at 25 km/h."
       },
@@ -1343,6 +1609,32 @@
         title: "B3A · 富泰邨 → 深圳湾口岸",
         routeTitle: "富泰邨 → 深圳湾口岸",
         routeMeta: "B3A 线 · 站点 003261 · 富泰邨，青山公路",
+        journeyEyebrow: "选择路线",
+        journeyStatusRoutes: "正在读取路线…",
+        journeyStatusRoutesError: "路线不可用",
+        journeyStatusStops: "正在读取站点…",
+        journeyStatusStopsError: "站点不可用",
+        routeFieldTitle: "选择城巴路线",
+        routeFieldSub: "搜索全部城巴路线",
+        routeSearchPlaceholder: "输入路线号码或字母…",
+        routeSearchAria: "搜索城巴路线",
+        routeListAria: "城巴路线",
+        routeLoading: "正在读取城巴路线…",
+        routeError: "无法读取城巴路线，请关闭后再试。",
+        routeEmpty: "没有符合条件的路线。",
+        routeNoName: "路线 {route}",
+        directionLabel: "方向",
+        directionOutbound: "去程",
+        directionInbound: "回程",
+        startLabel: "上车站",
+        endLabel: "下车站",
+        selectStop: "请选择站点",
+        stopFallback: "站点 {id}",
+        stopsLoading: "正在读取此路线的站点…",
+        stopsError: "无法读取此路线的站点。",
+        journeyHint: "实时到站会跟随所选路线、方向和上车站。",
+        routeMetaTemplate: "{route} 线 · 站点 {stop}",
+        titleTemplate: "{route} · {from} → {to}",
         boardEyebrow: "实时班次",
         boardTitleMain: "下一班",
         boardTitleSub: "巴士",
@@ -1358,7 +1650,7 @@
         loadingTitle: "正在读取班次…",
         loadingSub: "正在获取城巴实时数据",
         emptyNoTitle: "暂时没有即将到站的班次",
-        emptyNoText: "目前没有 B3A 实时班次，看板会自动再次检查。",
+        emptyNoText: "目前没有 {route} 实时班次，看板会自动再次检查。",
         emptyErrorTitle: "实时数据不可用",
         emptyErrorText: "请检查网络连接，看板正在自动重试。",
         nextDeparture: "下一班",
@@ -1437,7 +1729,7 @@
         regionTW: "荃湾",
         regionTM: "屯门",
         regionTMK: "屯门（汀九－大榄角）",
-        sourceBus: "巴士到站：城巴开放数据（DATA.GOV.HK）· 站点 003261。",
+        sourceBus: "巴士到站：城巴开放数据（DATA.GOV.HK）· {route} 线 · 站点 {stop}。",
         sourceOther: "天气：香港天文台 · 天气图：CMA · 汇率：open.er-api.com · 交通：运输署 / 香港出行易。",
         distanceNote: "距站距离按 25 公里/小时由预计到站时间推算，仅供参考。"
       },
@@ -1445,6 +1737,32 @@
         title: "B3A · 富泰邨 → 深圳灣口岸",
         routeTitle: "富泰邨 → 深圳灣口岸",
         routeMeta: "B3A 線 · 站點 003261 · 富泰邨，青山公路",
+        journeyEyebrow: "選擇路線",
+        journeyStatusRoutes: "正在讀取路線…",
+        journeyStatusRoutesError: "路線不可用",
+        journeyStatusStops: "正在讀取站點…",
+        journeyStatusStopsError: "站點不可用",
+        routeFieldTitle: "選擇城巴路線",
+        routeFieldSub: "搜尋全部城巴路線",
+        routeSearchPlaceholder: "輸入路線號碼或字母…",
+        routeSearchAria: "搜尋城巴路線",
+        routeListAria: "城巴路線",
+        routeLoading: "正在讀取城巴路線…",
+        routeError: "無法讀取城巴路線，請關閉後再試。",
+        routeEmpty: "沒有符合條件的路線。",
+        routeNoName: "路線 {route}",
+        directionLabel: "方向",
+        directionOutbound: "去程",
+        directionInbound: "回程",
+        startLabel: "上車站",
+        endLabel: "下車站",
+        selectStop: "請選擇站點",
+        stopFallback: "站點 {id}",
+        stopsLoading: "正在讀取此路線的站點…",
+        stopsError: "無法讀取此路線的站點。",
+        journeyHint: "實時到站會跟隨所選路線、方向和上車站。",
+        routeMetaTemplate: "{route} 線 · 站點 {stop}",
+        titleTemplate: "{route} · {from} → {to}",
         boardEyebrow: "實時班次",
         boardTitleMain: "下一班",
         boardTitleSub: "巴士",
@@ -1460,7 +1778,7 @@
         loadingTitle: "正在讀取班次…",
         loadingSub: "正在獲取城巴實時數據",
         emptyNoTitle: "暫時沒有即將到站的班次",
-        emptyNoText: "目前沒有 B3A 實時班次，看板會自動再次檢查。",
+        emptyNoText: "目前沒有 {route} 實時班次，看板會自動再次檢查。",
         emptyErrorTitle: "實時數據不可用",
         emptyErrorText: "請檢查網絡連接，看板正在自動重試。",
         nextDeparture: "下一班",
@@ -1539,7 +1857,7 @@
         regionTW: "荃灣",
         regionTM: "屯門",
         regionTMK: "屯門（汀九－大欖角）",
-        sourceBus: "巴士到站：城巴開放數據（DATA.GOV.HK）· 站點 003261。",
+        sourceBus: "巴士到站：城巴開放數據（DATA.GOV.HK）· {route} 線 · 站點 {stop}。",
         sourceOther: "天氣：香港天文台 · 天氣圖：CMA · 匯率：open.er-api.com · 交通：運輸署 / 香港出行易。",
         distanceNote: "距站距離按 25 公里/小時由預計到站時間推算，僅供參考。"
       }
@@ -1582,7 +1900,14 @@
       "zh-Hant": { USD: "美元", CNY: "人民幣", HKD: "港幣" }
     };
 
-    const BUS_API_URL = "https://rt.data.gov.hk/v2/transport/citybus/eta/CTB/003261/B3A";
+    const BUS_API_BASE = "https://rt.data.gov.hk/v2/transport/citybus";
+    const DEFAULT_ROUTE = "B3A";
+    const DEFAULT_DIRECTION = "O";
+    const DEFAULT_START_STOP = "003261";
+    const DEFAULT_END_STOP = "003208";
+    const STOP_CACHE_KEY = "b3a-stop-names-v1";
+    const ROUTE_CACHE_KEY = "b3a-route-list-v1";
+    const ROUTE_CACHE_MS = 24 * 60 * 60 * 1000;
     const HKO_API_BASE = "https://data.weather.gov.hk/weatherAPI/opendata/weather.php";
     const CMA_MAP_URL = "https://weather.cma.cn/web/weather/map.html";
     const CMA_NOW_URL = "https://weather.cma.cn/api/now/59493";
@@ -1605,7 +1930,21 @@
       busUpdated: null,
       busError: false,
       busLoading: true,
+      busRequestId: 0,
       nextRefreshAt: null,
+      route: DEFAULT_ROUTE,
+      direction: DEFAULT_DIRECTION,
+      routes: [],
+      routesLoading: true,
+      routesError: false,
+      routePickerOpen: false,
+      routeQuery: "",
+      stopList: [],
+      stopsLoading: true,
+      stopsError: false,
+      stopsRequestId: 0,
+      startSeq: null,
+      endSeq: null,
       weather: { rhr: null, flw: null, fnd: null, lang: null, error: false, loading: true },
       fx: { usdCny: null, usdHkd: null, cnyHkd: null, updated: null, error: false, loading: true },
       trafficExpanded: false,
@@ -1787,9 +2126,13 @@
     }
 
     function fetchJson(url) {
-      return fetch(url, { cache: "no-store" }).then(function (response) {
+      const controller = new AbortController();
+      const timer = setTimeout(function () { controller.abort(); }, 30000);
+      return fetch(url, { cache: "no-store", signal: controller.signal }).then(function (response) {
         if (!response.ok) throw new Error("HTTP " + response.status);
         return response.json();
+      }).finally(function () {
+        clearTimeout(timer);
       });
     }
 
@@ -2280,6 +2623,435 @@
       return ((minutes / 60) * 25).toFixed(1);
     }
 
+    const stopNameCache = loadStopNameCache();
+
+    function loadStopNameCache() {
+      try {
+        const raw = localStorage.getItem(STOP_CACHE_KEY);
+        const parsed = raw ? JSON.parse(raw) : null;
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function saveStopNameCache() {
+      try {
+        localStorage.setItem(STOP_CACHE_KEY, JSON.stringify(stopNameCache));
+      } catch (error) {}
+    }
+
+    function loadRouteCache() {
+      try {
+        const raw = localStorage.getItem(ROUTE_CACHE_KEY);
+        const parsed = raw ? JSON.parse(raw) : null;
+        if (!parsed || !Array.isArray(parsed.rows) || !parsed.rows.length) return [];
+        if (!Number.isFinite(parsed.time) || Date.now() - parsed.time > ROUTE_CACHE_MS) return [];
+        return parsed.rows;
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveRouteCache(rows) {
+      try {
+        localStorage.setItem(ROUTE_CACHE_KEY, JSON.stringify({ time: Date.now(), rows: rows }));
+      } catch (error) {}
+    }
+
+    function langKey() {
+      return currentLang === "zh-Hans" ? "sc" : currentLang === "zh-Hant" ? "tc" : "en";
+    }
+
+    function localName(item, prefix) {
+      if (!item) return "";
+      const key = langKey();
+      return item[prefix + "_" + key] || item[prefix + "_en"] || "";
+    }
+
+    function routeLabel(item) {
+      if (!item) return "";
+      return [localName(item, "orig"), localName(item, "dest")].filter(Boolean).join(" → ");
+    }
+
+    function stopName(stop) {
+      if (!stop) return "";
+      const key = langKey();
+      if (stop["name_" + key]) return stop["name_" + key];
+      if (stop.name_en) return stop.name_en;
+      const cached = stopNameCache[stop.stop];
+      if (!cached) return "";
+      return cached[key] || cached.en || "";
+    }
+
+    function stopDisplay(stop) {
+      return stopName(stop) || T().stopFallback.replace("{id}", stop.stop || "");
+    }
+
+    function stopBySeq(seq) {
+      if (seq == null) return null;
+      return state.stopList.find(function (stop) { return stop.seq === Number(seq); }) || null;
+    }
+
+    function currentBoardingStop() {
+      return stopBySeq(state.startSeq);
+    }
+
+    function currentAlightingStop() {
+      return stopBySeq(state.endSeq);
+    }
+
+    function currentStopId() {
+      const stop = currentBoardingStop();
+      if (stop) return stop.stop;
+      return state.route === DEFAULT_ROUTE ? DEFAULT_START_STOP : "";
+    }
+
+    function mapLimit(items, limit, worker) {
+      let cursor = 0;
+      const results = new Array(items.length);
+      const runners = [];
+      const count = Math.min(limit, items.length);
+      for (let i = 0; i < count; i += 1) {
+        runners.push((async function () {
+          while (cursor < items.length) {
+            const index = cursor;
+            cursor += 1;
+            try {
+              results[index] = await worker(items[index]);
+            } catch (error) {
+              results[index] = null;
+            }
+          }
+        })());
+      }
+      return Promise.all(runners).then(function () { return results; });
+    }
+
+    async function loadStopDetail(id) {
+      if (!id) return null;
+      if (stopNameCache[id]) return stopNameCache[id];
+      const data = await fetchJson(BUS_API_BASE + "/stop/" + encodeURIComponent(id));
+      const detail = data && data.data ? data.data : null;
+      if (!detail) return null;
+      const entry = {
+        en: detail.name_en || "",
+        sc: detail.name_sc || "",
+        tc: detail.name_tc || ""
+      };
+      if (!entry.en && !entry.sc && !entry.tc) return null;
+      stopNameCache[id] = entry;
+      return entry;
+    }
+
+    async function loadRoutes() {
+      if (!state.routes.length) {
+        const cachedRoutes = loadRouteCache();
+        if (cachedRoutes.length) state.routes = cachedRoutes;
+      }
+      state.routesLoading = state.routes.length === 0;
+      state.routesError = false;
+      renderJourney();
+      renderRouteList();
+      try {
+        const data = await fetchJson(BUS_API_BASE + "/route/CTB");
+        const rows = Array.isArray(data && data.data) ? data.data : [];
+        rows.sort(function (a, b) {
+          return String(a.route).localeCompare(String(b.route), "en", { numeric: true, sensitivity: "base" });
+        });
+        state.routes = rows;
+        state.routesError = false;
+        saveRouteCache(rows);
+      } catch (error) {
+        state.routesError = state.routes.length === 0;
+      }
+      state.routesLoading = false;
+      renderJourney();
+      renderRouteList();
+    }
+
+    function chooseDefaultStops() {
+      const list = state.stopList;
+      if (!list.length) {
+        state.startSeq = null;
+        state.endSeq = null;
+        return;
+      }
+      let start = list[0];
+      let end = list[list.length - 1];
+      if (state.route === DEFAULT_ROUTE && state.direction === DEFAULT_DIRECTION) {
+        const preferredStart = list.find(function (stop) { return stop.stop === DEFAULT_START_STOP; });
+        const preferredEnd = list.find(function (stop) { return stop.stop === DEFAULT_END_STOP; });
+        if (preferredStart) start = preferredStart;
+        if (preferredEnd) end = preferredEnd;
+      }
+      state.startSeq = start.seq;
+      state.endSeq = end.seq !== start.seq ? end.seq : (list.length > 1 ? list[list.length - 1].seq : null);
+    }
+
+    async function loadStops() {
+      const requestId = state.stopsRequestId + 1;
+      state.stopsRequestId = requestId;
+      state.busRequestId += 1;
+      state.stopsLoading = true;
+      state.stopsError = false;
+      state.stopList = [];
+      state.startSeq = null;
+      state.endSeq = null;
+      state.departures = [];
+      state.busLoading = true;
+      state.busError = false;
+      renderJourney();
+      renderBus();
+
+      try {
+        const directionPath = state.direction === "I" ? "inbound" : "outbound";
+        const data = await fetchJson(BUS_API_BASE + "/route-stop/CTB/" +
+          encodeURIComponent(state.route) + "/" + directionPath);
+        if (requestId !== state.stopsRequestId) return;
+        const rows = Array.isArray(data && data.data) ? data.data : [];
+        rows.sort(function (a, b) { return Number(a.seq) - Number(b.seq); });
+
+        const missing = [];
+        const seen = {};
+        rows.forEach(function (row) {
+          if (row && row.stop && !stopNameCache[row.stop] && !seen[row.stop]) {
+            seen[row.stop] = true;
+            missing.push(row.stop);
+          }
+        });
+
+        state.stopList = rows.map(function (row) {
+          const cached = stopNameCache[row.stop] || {};
+          return {
+            seq: Number(row.seq),
+            stop: row.stop,
+            name_en: cached.en || "",
+            name_sc: cached.sc || "",
+            name_tc: cached.tc || ""
+          };
+        });
+        chooseDefaultStops();
+        state.stopsLoading = false;
+        state.stopsError = false;
+        renderJourney();
+        renderBus();
+        fetchBus();
+
+        if (missing.length) {
+          mapLimit(missing, 8, loadStopDetail).then(function () {
+            if (requestId !== state.stopsRequestId) return;
+            saveStopNameCache();
+            state.stopList = state.stopList.map(function (stop) {
+              const cached = stopNameCache[stop.stop];
+              if (!cached) return stop;
+              return {
+                seq: stop.seq,
+                stop: stop.stop,
+                name_en: cached.en || stop.name_en,
+                name_sc: cached.sc || stop.name_sc,
+                name_tc: cached.tc || stop.name_tc
+              };
+            });
+            renderJourney();
+            renderBus();
+          });
+        }
+      } catch (error) {
+        if (requestId !== state.stopsRequestId) return;
+        state.stopList = [];
+        state.startSeq = null;
+        state.endSeq = null;
+        state.stopsLoading = false;
+        state.stopsError = true;
+        state.busLoading = false;
+        state.busError = true;
+        renderJourney();
+        renderBus();
+      }
+    }
+
+    function routeMatches(item, query) {
+      if (!query) return true;
+      const code = String(item.route || "").toUpperCase();
+      const codeMatch = code.indexOf(query) !== -1;
+      if (codeMatch) return true;
+      if (query.length < 3) return false;
+      const key = langKey();
+      const text = [
+        item["orig_" + key], item["dest_" + key],
+        item.orig_en, item.dest_en
+      ].filter(Boolean).join(" ").toUpperCase();
+      return text.indexOf(query) !== -1;
+    }
+
+    function renderRouteList() {
+      const list = document.getElementById("routeList");
+      if (!list) return;
+      const t = T();
+      if (state.routesLoading) {
+        list.innerHTML = '<div class="route-option-empty">' + escapeHtml(t.routeLoading) + '</div>';
+        return;
+      }
+      if (state.routesError) {
+        list.innerHTML = '<div class="route-option-empty">' + escapeHtml(t.routeError) + '</div>';
+        return;
+      }
+      const query = state.routeQuery.trim().toUpperCase();
+      const rows = state.routes.filter(function (item) { return routeMatches(item, query); });
+      if (!rows.length) {
+        list.innerHTML = '<div class="route-option-empty">' + escapeHtml(t.routeEmpty) + '</div>';
+        return;
+      }
+      list.innerHTML = rows.map(function (item) {
+        const label = routeLabel(item) || t.routeNoName.replace("{route}", item.route);
+        return '<button class="route-option" type="button" role="option" data-route="' +
+          escapeHtml(item.route) + '" aria-selected="' + (item.route === state.route ? "true" : "false") + '">' +
+          '<span class="route-option-code">' + escapeHtml(item.route) + '</span>' +
+          '<span class="route-option-copy"><strong>' + escapeHtml(label) + '</strong></span>' +
+        '</button>';
+      }).join("");
+    }
+
+    function populateStopSelect(select, isEnd) {
+      const t = T();
+      const start = currentBoardingStop();
+      const rows = state.stopList.filter(function (stop) {
+        return !isEnd || !start || stop.seq !== start.seq;
+      });
+      const selected = isEnd ? state.endSeq : state.startSeq;
+      if (!rows.length) {
+        select.innerHTML = '<option value="">' +
+          escapeHtml(state.stopsLoading ? t.stopsLoading : t.selectStop) + '</option>';
+      } else {
+        select.innerHTML = rows.map(function (stop) {
+          return '<option value="' + stop.seq + '"' + (stop.seq === selected ? " selected" : "") + '>' +
+            escapeHtml(stopDisplay(stop)) + '</option>';
+        }).join("");
+      }
+      select.disabled = state.stopsLoading || state.stopsError || !rows.length;
+    }
+
+    function updateRouteHeader() {
+      const t = T();
+      const start = currentBoardingStop();
+      const end = currentAlightingStop();
+      const routeInfo = state.routes.find(function (item) { return item.route === state.route; });
+      const from = stopName(start);
+      const to = stopName(end);
+      const fallbackLabel = routeLabel(routeInfo) || t.routeTitle;
+      const stopId = currentStopId() || "—";
+      const badge = document.getElementById("routeBadge");
+      const title = document.getElementById("routeTitle");
+      const meta = document.getElementById("routeMeta");
+      if (badge) badge.textContent = state.route;
+      if (title) title.textContent = from && to ? from + " → " + to : fallbackLabel;
+      if (meta) {
+        meta.textContent = (t.routeMetaTemplate || "{route} · {stop}")
+          .replace("{route}", state.route)
+          .replace("{stop}", stopId);
+      }
+      document.title = (t.titleTemplate || "{route} · {from} → {to}")
+        .replace("{route}", state.route)
+        .replace("{from}", from || fallbackLabel)
+        .replace("{to}", to || "");
+      const source = document.getElementById("sourceLine");
+      if (source) {
+        source.innerHTML = escapeHtml((t.sourceBus || "")
+          .replace("{route}", state.route)
+          .replace("{stop}", stopId))
+          .replace("DATA.GOV.HK", '<a href="https://data.gov.hk/" target="_blank" rel="noopener">DATA.GOV.HK</a>');
+      }
+    }
+
+    function renderJourney() {
+      const t = T();
+      const badge = document.getElementById("routeFieldBadge");
+      const fieldTitle = document.getElementById("routeFieldTitle");
+      const fieldSub = document.getElementById("routeFieldSub");
+      const status = document.getElementById("journeyStatus");
+      const note = document.getElementById("journeyNote");
+      const directionSelect = document.getElementById("directionSelect");
+      const startSelect = document.getElementById("startSelect");
+      const endSelect = document.getElementById("endSelect");
+      const picker = document.getElementById("routePicker");
+      const search = document.getElementById("routeSearch");
+      if (!badge || !fieldTitle || !fieldSub || !directionSelect || !startSelect || !endSelect) return;
+
+      const routeInfo = state.routes.find(function (item) { return item.route === state.route; });
+      badge.textContent = state.route;
+      fieldTitle.textContent = routeInfo ? routeLabel(routeInfo) : state.route;
+      fieldSub.textContent = state.stopsLoading ? t.stopsLoading : t.routeFieldSub;
+      document.getElementById("routeField").setAttribute("aria-expanded", state.routePickerOpen ? "true" : "false");
+      if (picker) picker.hidden = !state.routePickerOpen;
+      if (search) {
+        search.placeholder = t.routeSearchPlaceholder;
+        search.setAttribute("aria-label", t.routeSearchAria);
+      }
+
+      document.getElementById("journeyHeading").textContent = t.journeyEyebrow;
+      document.getElementById("directionLabel").textContent = t.directionLabel;
+      document.getElementById("startLabel").textContent = t.startLabel;
+      document.getElementById("endLabel").textContent = t.endLabel;
+
+      if (directionSelect.options[0]) directionSelect.options[0].textContent = t.directionOutbound;
+      if (directionSelect.options[1]) directionSelect.options[1].textContent = t.directionInbound;
+      directionSelect.value = state.direction;
+      directionSelect.disabled = state.stopsLoading;
+
+      populateStopSelect(startSelect, false);
+      populateStopSelect(endSelect, true);
+
+      let statusText = "";
+      let statusError = false;
+      if (state.routesLoading) {
+        statusText = t.journeyStatusRoutes;
+      } else if (state.routesError) {
+        statusText = t.journeyStatusRoutesError;
+        statusError = true;
+      } else if (state.stopsLoading) {
+        statusText = t.journeyStatusStops;
+      } else if (state.stopsError) {
+        statusText = t.journeyStatusStopsError;
+        statusError = true;
+      }
+      if (status) {
+        status.textContent = statusText;
+        status.classList.toggle("error", statusError);
+      }
+      if (note) {
+        const showError = state.stopsError || state.routesError;
+        note.textContent = state.stopsLoading ? t.stopsLoading : showError ? t.stopsError : t.journeyHint;
+        note.classList.toggle("error", showError);
+      }
+
+      updateRouteHeader();
+    }
+
+    function selectRoute(route) {
+      if (!route) return;
+      state.routePickerOpen = false;
+      state.routeQuery = "";
+      const search = document.getElementById("routeSearch");
+      if (search) search.value = "";
+      if (route === state.route) {
+        renderJourney();
+        renderRouteList();
+        return;
+      }
+      state.route = route;
+      state.direction = DEFAULT_DIRECTION;
+      state.stopList = [];
+      state.startSeq = null;
+      state.endSeq = null;
+      state.departures = [];
+      state.busLoading = true;
+      state.busError = false;
+      renderJourney();
+      renderRouteList();
+      loadStops();
+    }
+
     function renderBus() {
       const t = T();
       const list = document.getElementById("departures");
@@ -2356,17 +3128,20 @@
         list.innerHTML = '<div class="empty">' +
           '<div class="empty-icon" aria-hidden="true">🚌</div>' +
           '<h3>' + escapeHtml(t.emptyNoTitle) + '</h3>' +
-          '<p>' + escapeHtml(t.emptyNoText) + '</p>' +
+          '<p>' + escapeHtml(t.emptyNoText.replace("{route}", state.route)) + '</p>' +
         '</div>';
         return;
       }
+
+      const routeInfo = state.routes.find(function (item) { return item.route === state.route; });
 
       list.innerHTML = buses.map(function (item, index) {
         const minutes = minutesUntil(item.eta);
         const isDue = minutes == null || minutes <= 0;
         const km = distanceToStop(minutes);
+        const destination = stopName(currentAlightingStop()) || localName(routeInfo, "dest") || t.toDestination;
         const distance = km === "—" || isDue ? "" : t.approxDistance.replace("{km}", km);
-        const subtitle = [t.toDestination, distance].filter(Boolean).join(" · ");
+        const subtitle = [destination, distance].filter(Boolean).join(" · ");
         const label = index === 0 ? t.nextDeparture : t.followingBus;
         const countdown = isDue
           ? '<div class="countdown due"><strong>' + escapeHtml(t.due) + '</strong></div>'
@@ -2383,28 +3158,40 @@
       }).join("");
     }
 
-    let busFetching = false;
-
     async function fetchBus() {
-      if (busFetching) return;
-      busFetching = true;
+      const stopId = currentStopId();
+      if (!stopId) {
+        state.busLoading = false;
+        state.busError = true;
+        renderBus();
+        return;
+      }
+      const requestId = state.busRequestId + 1;
+      state.busRequestId = requestId;
+      const requestRoute = state.route;
+      const requestDirection = state.direction;
       state.busLoading = true;
       state.nextRefreshAt = null;
       renderBus();
       try {
-        const data = await fetchJson(BUS_API_URL);
+        const url = BUS_API_BASE + "/eta/CTB/" + encodeURIComponent(stopId) + "/" + encodeURIComponent(requestRoute);
+        const data = await fetchJson(url);
+        if (requestId !== state.busRequestId) return;
         const rows = Array.isArray(data && data.data) ? data.data : [];
         state.departures = rows
-          .filter(function (item) { return item && item.eta; })
+          .filter(function (item) {
+            return item && item.eta && (!item.dir || item.dir === requestDirection);
+          })
           .sort(function (a, b) { return new Date(a.eta) - new Date(b.eta); });
         state.busUpdated = new Date();
         state.busError = false;
       } catch (error) {
+        if (requestId !== state.busRequestId) return;
         state.busError = true;
       }
+      if (requestId !== state.busRequestId) return;
       state.busLoading = false;
       state.nextRefreshAt = Date.now() + REFRESH_BUS_MS;
-      busFetching = false;
       renderBus();
     }
 
@@ -2447,6 +3234,8 @@
         button.setAttribute("aria-pressed", button.getAttribute("data-lang") === currentLang ? "true" : "false");
       });
 
+      renderJourney();
+      renderRouteList();
       renderWeatherTicker();
       renderFxTicker();
       renderTrafficTicker();
@@ -2465,6 +3254,92 @@
       });
 
       document.getElementById("refreshBtn").addEventListener("click", fetchBus);
+
+      const routeField = document.getElementById("routeField");
+      const routeSearch = document.getElementById("routeSearch");
+      const routeList = document.getElementById("routeList");
+      const directionSelect = document.getElementById("directionSelect");
+      const startSelect = document.getElementById("startSelect");
+      const endSelect = document.getElementById("endSelect");
+
+      if (routeField) {
+        routeField.addEventListener("click", function () {
+          state.routePickerOpen = !state.routePickerOpen;
+          if (state.routePickerOpen && state.routesError && !state.routesLoading) loadRoutes();
+          renderJourney();
+          renderRouteList();
+          if (state.routePickerOpen && routeSearch) {
+            routeSearch.value = state.routeQuery;
+            routeSearch.focus();
+          }
+        });
+      }
+
+      if (routeSearch) {
+        routeSearch.addEventListener("input", function () {
+          state.routeQuery = routeSearch.value;
+          renderRouteList();
+        });
+        routeSearch.addEventListener("keydown", function (event) {
+          if (event.key !== "Escape") return;
+          state.routePickerOpen = false;
+          state.routeQuery = "";
+          routeSearch.value = "";
+          renderJourney();
+          if (routeField) routeField.focus();
+        });
+      }
+
+      if (routeList) {
+        routeList.addEventListener("click", function (event) {
+          const option = event.target.closest("[data-route]");
+          if (!option) return;
+          selectRoute(option.getAttribute("data-route"));
+          if (routeField) routeField.focus();
+        });
+      }
+
+      if (directionSelect) {
+        directionSelect.addEventListener("change", function () {
+          const value = directionSelect.value === "I" ? "I" : "O";
+          if (value === state.direction) return;
+          state.direction = value;
+          state.routePickerOpen = false;
+          loadStops();
+        });
+      }
+
+      if (startSelect) {
+        startSelect.addEventListener("change", function () {
+          if (!startSelect.value) return;
+          state.startSeq = Number(startSelect.value);
+          if (state.endSeq === state.startSeq || !stopBySeq(state.endSeq)) {
+            const choices = state.stopList.filter(function (stop) { return stop.seq !== state.startSeq; });
+            state.endSeq = choices.length ? choices[choices.length - 1].seq : null;
+          }
+          renderJourney();
+          renderBus();
+          fetchBus();
+        });
+      }
+
+      if (endSelect) {
+        endSelect.addEventListener("change", function () {
+          if (!endSelect.value) return;
+          state.endSeq = Number(endSelect.value);
+          renderJourney();
+          renderBus();
+        });
+      }
+
+      document.addEventListener("click", function (event) {
+        if (!state.routePickerOpen) return;
+        const panel = document.querySelector(".journey-panel");
+        if (panel && !panel.contains(event.target)) {
+          state.routePickerOpen = false;
+          renderJourney();
+        }
+      });
 
       document.getElementById("trafficHideBtn").addEventListener("click", function () {
         state.snapshotUserHidden = true;
@@ -2550,6 +3425,8 @@
         renderBus();
       }, 1000);
 
+      loadRoutes();
+      loadStops();
       fetchBus();
       fetchWeather();
       fetchFx();
